@@ -41,8 +41,11 @@ export const INTERVAL_DEFAULT = 8, INTERVAL_MIN = 1, INTERVAL_MAX = 60;
 export const LOOKAHEAD_M = 100, SAMPLE_M = 2;
 /** 월드 x 10 이 1 m 다. */
 export const PER_M = 10;
-/** 시드 범위: 규칙의 시드 PRNG 가 32비트라 이 범위 밖의 시드는 다른 시드와 같은 판이 된다. */
+/** 시드 범위: 규칙의 시드 PRNG 가 32비트라 이 범위 밖의 시드는 다른 시드와 같은 판이 된다.
+ * 0 은 받지 않는다. `createRng(0)` 이 `createRng(0x9e3779b9)` 와 같은 상태를 내기 때문이다(점수는 바꾸지 않으려고 `createRng` 는 그대로 둔다). */
+export const PUDDING_SEED_MIN = 1;
 export const PUDDING_SEED_MAX = 2 ** 32 - 1;
+export const PUDDING_SEED_ZERO_ALIAS = 0x9e3779b9;
 
 /** ms 를 걸음 수로: 범위로 자른 뒤 `Math.round(ms × 120 / 1000)`(반 걸음은 위로). */
 export function msToSteps(ms: number, maxMs: number): number {
@@ -189,7 +192,9 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
   }
 
   reset(seed: number): PuddingObs {
-    if (!Number.isSafeInteger(seed) || seed < 0 || seed > PUDDING_SEED_MAX) throw new Error(`seed must be an integer 0..${PUDDING_SEED_MAX}: ${seed}`);
+    if (!Number.isSafeInteger(seed) || seed < PUDDING_SEED_MIN || seed > PUDDING_SEED_MAX) {
+      throw new Error(`seed must be an integer ${PUDDING_SEED_MIN}..${PUDDING_SEED_MAX} (0 is rejected: it aliases ${PUDDING_SEED_ZERO_ALIAS}): ${seed}`);
+    }
     const run = createRun(seed);
     startRun(run, seed, false);
     this.st = { run, seed, steps: 0, done: false, caught: false, decisions: 0, invalid: 0, actions: [], seg: EMPTY_SEGMENT };

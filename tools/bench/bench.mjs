@@ -1,13 +1,13 @@
 // 게임 벤치마크 CLI(2026-11-21). 1호 환경은 푸딩 탈출이다. 계약: docs/kaito-web/game-benchmark.md
-// 실행(kaito_web/): node tools/bench/bench.mjs <명령> … 또는 npm run bench -- <명령> …
+// 실행(저장소 루트): node tools/bench/bench.mjs <명령> … 또는 npm run bench -- <명령> …
 //   baselines [--seeds 1-50] [--mode segment|interval:8] [--agents random,fullCharge,oracle] [--json out.json]
 //   run --agent "<명령>" [--seeds 1-10 | --seeds-file 경로 [--round 이름]] [--official] [--mode …] [--out 폴더] [--timeout 300]
 //   verify <trace.json | summary.json …> [--seeds-file 경로] [--official]
 //   compare <a/summary.json> <b/summary.json>
 //   seeds-commit <seeds-file> [--round 이름]
 //   version
-// Node 22.18+ 의 TypeScript 형 지우기로 src/sim 을 바로 읽는다. 확장자 없는 import 는 아래 훅이 `.ts` 를 붙인다(tools/pudding/measure-landings.mjs 와 같다).
-import { registerHooks } from "node:module";
+// Node 22.18+ 의 TypeScript 형 지우기로 src/sim 을 바로 읽는다. 확장자 없는 import 는 register-ts.mjs 훅이 `.ts` 를 붙인다.
+import "./register-ts.mjs";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
@@ -15,13 +15,7 @@ import fs from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { benchEnvVersion } from "./sources.mjs";
-
-registerHooks({
-  resolve(specifier, context, next) {
-    try { return next(specifier, context); }
-    catch (error) { if (specifier.startsWith(".")) return next(`${specifier}.ts`, context); throw error; }
-  },
-});
+import { redactAgentCommand } from "./redact.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const B = await import(pathToFileURL(path.join(ROOT, "src/sim/bench/index.ts")).href);
@@ -31,7 +25,7 @@ const AGENT_META_MAX = 4096;
 
 /** 환경 판: 벤치 import 닫힘의 상대 경로와 내용을 sha256 에 넣은 앞 12 글자(`sources.mjs`). */
 const envVersion = () => benchEnvVersion(ROOT);
-const isSeed = n => Number.isSafeInteger(n) && n >= 0 && n <= B.PUDDING_SEED_MAX;
+const isSeed = n => Number.isSafeInteger(n) && n >= B.PUDDING_SEED_MIN && n <= B.PUDDING_SEED_MAX;
 
 function parseArgs(argv) {
   const out = { _: [] };
@@ -52,7 +46,7 @@ function parseSeeds(spec) {
     const m = /^(\d+)(?:-(\d+))?$/.exec(part);
     if (!m) throw new Error(`bad seed range: ${part}`);
     const a = Number(m[1]), b = Number(m[2] ?? m[1]);
-    if (!isSeed(a) || !isSeed(b) || b < a || b - a > 100000) throw new Error(`bad seed range: ${part} (seeds are 0..${B.PUDDING_SEED_MAX})`);
+    if (!isSeed(a) || !isSeed(b) || b < a || b - a > 100000) throw new Error(`bad seed range: ${part} (seeds are ${B.PUDDING_SEED_MIN}..${B.PUDDING_SEED_MAX}, 0 is rejected)`);
     for (let s = a; s <= b; s++) seeds.push(s);
   }
   if (!seeds.length) throw new Error("no seeds");
@@ -62,7 +56,7 @@ function parseSeeds(spec) {
 function readSeedsFile(file) {
   const text = fs.readFileSync(file, "utf8").trim();
   const list = text.startsWith("[") ? JSON.parse(text) : text.split(/[\s,]+/).filter(Boolean).map(Number);
-  if (!Array.isArray(list) || !list.length || !list.every(isSeed)) throw new Error(`seeds file must hold integers 0..${B.PUDDING_SEED_MAX}: ${file}`);
+  if (!Array.isArray(list) || !list.length || !list.every(isSeed)) throw new Error(`seeds file must hold integers ${B.PUDDING_SEED_MIN}..${B.PUDDING_SEED_MAX} (0 is rejected): ${file}`);
   return list;
 }
 
@@ -117,6 +111,7 @@ function cmdBaselines(args) {
  */
 class AgentProcess {
   constructor(command) {
+    // 로컬에서 자기 에이전트 명령을 돌리려고 셸을 쓴다. 공개 리더보드처럼 남이 준 문자열을 실행할 때는 셸 없이 argv 로 나누고 권한을 줄여야 한다.
     this.child = spawn(command, { shell: true, stdio: ["pipe", "pipe", "inherit"], cwd: process.cwd() });
     this.lines = []; this.waiters = []; this.closed = false;
     this.meta = {}; this.metaTruncated = false;
@@ -191,6 +186,7 @@ async function cmdRun(args) {
   const outDir = path.resolve(String(args.out ?? `bench-out/${B.PUDDING_GAME}-${new Date().toISOString().replace(/[:.]/g, "-")}`));
   fs.mkdirSync(outDir, { recursive: true });
   const env = new B.PuddingBenchEnv({ envVersion: version, actionMode: mode });
+  if (official && env.mode.kind !== "segment") throw new Error("--official needs segment mode (interval is reference only, not ranked)");
   const agent = new AgentProcess(args.agent);
   const rules = B.puddingRules(env.mode), results = [], traces = [];
   let timeouts = 0, agentExited = null;
@@ -217,7 +213,7 @@ async function cmdRun(args) {
   const { stats, scored } = summarize(results);
   const summary = {
     format: SUMMARY_FORMAT, game: B.PUDDING_GAME, envVersion: version, track: env.track, actionMode: env.actionMode, capS: B.PUDDING_CAP_S,
-    official, seedsCommit: seedsFile ? seedsCommit(seeds, round) : null, agent: args.agent,
+    official, seedsCommit: seedsFile ? seedsCommit(seeds, round) : null, agent: redactAgentCommand(args.agent),
     createdAt: new Date().toISOString(), nodeVersion: process.version, timeouts, agentExited,
     agentMeta: agent.meta, ...(agent.metaTruncated ? { agentMetaTruncated: true } : {}),
     bootstrap: { resamples: B.BOOTSTRAP_RESAMPLES, seed: B.BOOTSTRAP_SEED },
@@ -266,6 +262,7 @@ function verifySummary(file, doc, version, seedSet, official, say) {
   if (!mode || B.actionModeName(mode) !== doc.actionMode) fail(`bad actionMode ${doc.actionMode}`);
   if (doc.capS !== B.PUDDING_CAP_S) fail(`capS ${doc.capS} is not ${B.PUDDING_CAP_S}`);
   if (official && doc.official !== true) fail("summary is not an official run (--official)");
+  if (official && doc.actionMode !== "segment") fail(`--official needs segment mode (got ${doc.actionMode})`);
   const episodes = Array.isArray(doc.episodes) ? doc.episodes : [];
   if (!episodes.length) fail("summary has no episodes");
   const results = [], seenFiles = new Set(), seenSeeds = new Set();
@@ -332,11 +329,18 @@ function cmdVerify(args) {
   process.exitCode = failed ? 1 : 0;
 }
 
-/** 두 요약을 같은 시드끼리 짝지어 정규화 점수 차(a − b)의 평균과 부트스트랩 95% 구간을 낸다. 요약 값을 그대로 쓰므로 먼저 verify 한다. */
+/** 두 요약을 같은 시드끼리 짝지어 정규화 점수 차(a − b)의 평균과 부트스트랩 95% 구간을 낸다. 먼저 이 체크아웃으로 두 요약을 verify 한다. */
 function cmdCompare(args) {
   if (args._.length !== 2) throw new Error("compare needs two summary files");
   const [a, b] = args._.map(f => JSON.parse(fs.readFileSync(f, "utf8")));
   for (const [f, d] of [[args._[0], a], [args._[1], b]]) if (d?.format !== SUMMARY_FORMAT) throw new Error(`${f} is not a summary`);
+  const version = envVersion();
+  const say = (file, msg) => console.log(`${file}: ${msg}`);
+  let failed = false;
+  for (const [f, d] of [[args._[0], a], [args._[1], b]]) {
+    if (verifySummary(f, d, version, null, false, say).length) failed = true;
+  }
+  if (failed) { process.exitCode = 1; return; }
   if (a.envVersion !== b.envVersion) throw new Error(`envVersion differs: ${a.envVersion} vs ${b.envVersion}`);
   if (a.actionMode !== b.actionMode) console.error(`warning: actionMode differs (${a.actionMode} vs ${b.actionMode})`);
   const c = B.comparePaired(a.episodes, b.episodes);

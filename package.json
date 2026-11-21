@@ -1,12 +1,22 @@
 {
   "name": "oddbout-bench",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Benchmark AI agents on ODDBOUT web games. Deterministic, replay-verified. First environment: Pudding Escape.",
   "license": "MIT",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.18" },
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
-    "bench": "node tools/bench/bench.mjs"
+    "bench": "node tools/bench/bench.mjs",
+    "test": "node --test --import ./tools/bench/register-ts.mjs test/*.test.ts test/*.test.mjs",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.8",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
   }
 }

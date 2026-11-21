@@ -2,16 +2,16 @@
 // 실행(kaito_web/): node tools/bench/bench.mjs <명령> … 또는 npm run bench -- <명령> …
 //   baselines [--seeds 1-40] [--mode segment|interval:8] [--agents random,fullCharge,oracle] [--json out.json]
 //   run --agent "<명령>" [--seeds 1-10 | --seeds-file 경로] [--mode …] [--out 폴더] [--timeout 300]
-//   verify <trace.json | summary.json …>
+//   verify <trace.json | summary.json …> [--seeds-file 경로]
 //   version
 // Node 22.18+ 의 TypeScript 형 지우기로 src/sim 을 바로 읽는다. 확장자 없는 import 는 아래 훅이 `.ts` 를 붙인다(tools/pudding/measure-landings.mjs 와 같다).
 import { registerHooks } from "node:module";
 import { pathToFileURL, fileURLToPath } from "node:url";
-import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import fs from "node:fs";
 import path from "node:path";
+import { benchEnvVersion } from "./sources.mjs";
 
 registerHooks({
   resolve(specifier, context, next) {
@@ -24,15 +24,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const B = await import(pathToFileURL(path.join(ROOT, "src/sim/bench/index.ts")).href);
 const SUMMARY_FORMAT = "oddbout-bench-summary/1";
 const BOOTSTRAP_RESAMPLES = 2000, BOOTSTRAP_SEED = 20261121;
+/** 에이전트가 보낸 자가 보고(`meta`)를 요약에 남기는 크기 상한(JSON 바이트). */
+const AGENT_META_MAX = 4096;
 
-/** 환경 판: 규칙 · 환경 소스(경로 차례)의 상대 경로와 내용을 sha256 에 넣은 앞 12 글자. */
-function envVersion() {
-  const dirs = ["src/sim/pudding", "src/sim/bench"];
-  const files = [...dirs.flatMap(d => fs.readdirSync(path.join(ROOT, d)).filter(f => f.endsWith(".ts")).map(f => `${d}/${f}`)), "src/sim/rng.ts", "src/sim/types.ts"].sort();
-  const h = createHash("sha256");
-  for (const f of files) { h.update(f); h.update("\0"); h.update(fs.readFileSync(path.join(ROOT, f))); h.update("\0"); }
-  return h.digest("hex").slice(0, 12);
-}
+/** 환경 판: 벤치 import 닫힘의 상대 경로와 내용을 sha256 에 넣은 앞 12 글자(`sources.mjs`). */
+const envVersion = () => benchEnvVersion(ROOT);
+const isSeed = n => Number.isSafeInteger(n) && n >= 0 && n <= B.PUDDING_SEED_MAX;
 
 function parseArgs(argv) {
   const out = { _: [] };
@@ -53,6 +50,7 @@ function parseSeeds(spec) {
     const m = /^(\d+)(?:-(\d+))?$/.exec(part);
     if (!m) throw new Error(`bad seed range: ${part}`);
     const a = Number(m[1]), b = Number(m[2] ?? m[1]);
+    if (!isSeed(a) || !isSeed(b) || b < a || b - a > 100000) throw new Error(`bad seed range: ${part} (seeds are 0..${B.PUDDING_SEED_MAX})`);
     for (let s = a; s <= b; s++) seeds.push(s);
   }
   if (!seeds.length) throw new Error("no seeds");
@@ -62,7 +60,7 @@ function parseSeeds(spec) {
 function readSeedsFile(file) {
   const text = fs.readFileSync(file, "utf8").trim();
   const list = text.startsWith("[") ? JSON.parse(text) : text.split(/[\s,]+/).filter(Boolean).map(Number);
-  if (!list.length || !list.every(n => Number.isSafeInteger(n) && n >= 0)) throw new Error(`seeds file must hold non-negative integers: ${file}`);
+  if (!Array.isArray(list) || !list.length || !list.every(isSeed)) throw new Error(`seeds file must hold integers 0..${B.PUDDING_SEED_MAX}: ${file}`);
   return list;
 }
 
@@ -113,20 +111,36 @@ function cmdBaselines(args) {
   if (typeof args.json === "string") { fs.writeFileSync(args.json, `${JSON.stringify(json, null, 2)}\n`); console.log(`wrote ${args.json}`); }
 }
 
-/** 에이전트 프로세스와 JSON 줄로 말한다. 줄마다 하나의 JSON 객체다. */
+/**
+ * 에이전트 프로세스와 JSON 줄로 말한다. 줄마다 하나의 JSON 객체다.
+ * `{"type":"meta", …}` 줄은 행동이 아니라 자가 보고다. 아무 때나 와도 되고 `meta` 에 겹쳐 쌓는다(뒤 값이 이긴다).
+ */
 class AgentProcess {
   constructor(command) {
     this.child = spawn(command, { shell: true, stdio: ["pipe", "pipe", "inherit"], cwd: process.cwd() });
     this.lines = []; this.waiters = []; this.closed = false;
+    this.meta = {}; this.metaTruncated = false;
     createInterface({ input: this.child.stdout }).on("line", line => {
       if (!line.trim()) return;
+      if (this.takeMeta(line)) return;
       const w = this.waiters.shift();
       if (w) w(line); else this.lines.push(line);
     });
-    this.child.on("exit", () => { this.closed = true; for (const w of this.waiters.splice(0)) w(null); });
-    this.child.stdin.on("error", () => { this.closed = true; });
+    // `exit` 는 stdout 에 남은 줄보다 먼저 올 수 있다. 줄을 다 읽은 뒤의 `close` 에서 닫는다.
+    this.child.on("close", () => { this.closed = true; for (const w of this.waiters.splice(0)) w(null); });
+    this.child.stdin.on("error", () => {});
   }
-  send(msg) { if (!this.closed) this.child.stdin.write(`${JSON.stringify(msg)}\n`); }
+  /** meta 줄이면 쌓고 true. */
+  takeMeta(line) {
+    let msg;
+    try { msg = JSON.parse(line); } catch { return false; }
+    if (!msg || typeof msg !== "object" || Array.isArray(msg) || msg.type !== "meta") return false;
+    const { type: _type, ...fields } = msg;
+    const next = { ...this.meta, ...fields };
+    if (Buffer.byteLength(JSON.stringify(next)) <= AGENT_META_MAX) this.meta = next; else this.metaTruncated = true;
+    return true;
+  }
+  send(msg) { if (!this.closed && this.child.stdin.writable) this.child.stdin.write(`${JSON.stringify(msg)}\n`); }
   /** 다음 줄(시간이 지나거나 프로세스가 끝나면 null). */
   next(timeoutMs) {
     if (this.lines.length) return Promise.resolve(this.lines.shift());
@@ -139,50 +153,57 @@ class AgentProcess {
   }
   async stop() {
     this.send({ type: "end" });
-    this.child.stdin.end();
-    await new Promise(resolve => { if (this.closed) resolve(); else { const t = setTimeout(() => { this.child.kill(); resolve(); }, 2000); this.child.on("exit", () => { clearTimeout(t); resolve(); }); } });
+    if (this.child.stdin.writable) this.child.stdin.end();
+    await new Promise(resolve => { if (this.closed) resolve(); else { const t = setTimeout(() => { this.child.kill(); resolve(); }, 2000); this.child.on("close", () => { clearTimeout(t); resolve(); }); } });
   }
 }
 
 /**
- * 결정 하나의 행동을 받는다. 답 줄에 `step` 이 있으면 지금 결정 번호와 같아야 한다(시간이 지난 늦은 답을 버린다).
- * 시간이 지나거나 · 프로세스가 끝나거나 · JSON 이 아니면 null(잘못된 행동 → 빈 행동)을 돌려준다.
+ * 결정 하나의 행동을 받는다. 답 줄은 `{"step": 지금 결정 번호, "action": …}` 이어야 한다.
+ * `step` 이 없거나 다른 줄, JSON 이 아닌 줄은 버리고 마감까지 기다린다(늦은 답 · 로그 줄이 다음 결정에 섞이지 않게).
+ * 시간이 지나거나 프로세스가 끝나면 null(잘못된 행동 → 빈 행동)을 돌려준다.
  */
 async function readAction(agent, step, deadline) {
   for (;;) {
     const left = deadline - Date.now();
-    if (left <= 0) return { action: null, timeout: true };
+    if (left <= 0) return { action: null, timeout: true, exited: false };
     const line = await agent.next(left);
-    if (line === null) return { action: null, timeout: !agent.closed };
+    if (line === null) return { action: null, timeout: !agent.closed, exited: agent.closed };
     let msg;
-    try { msg = JSON.parse(line); } catch { return { action: null, timeout: false }; }
-    if (msg && typeof msg === "object" && "step" in msg && msg.step !== step) continue;
-    return { action: msg && typeof msg === "object" && "action" in msg ? msg.action : null, timeout: false };
+    try { msg = JSON.parse(line); } catch { continue; }
+    if (!msg || typeof msg !== "object" || Array.isArray(msg) || msg.step !== step) continue;
+    return { action: "action" in msg ? msg.action : null, timeout: false, exited: false };
   }
 }
 
 async function cmdRun(args) {
   if (typeof args.agent !== "string") throw new Error("run needs --agent \"<command>\"");
   const seeds = typeof args["seeds-file"] === "string" ? readSeedsFile(args["seeds-file"]) : parseSeeds(args.seeds ?? B.PUDDING_PRACTICE_SEEDS.join(","));
-  const version = envVersion(), mode = String(args.mode ?? "segment"), timeoutMs = Number(args.timeout ?? 300) * 1000;
+  if (new Set(seeds).size !== seeds.length) throw new Error("seeds must not repeat (one trace file per seed)");
+  const timeoutS = Number(args.timeout ?? 300);
+  if (!Number.isFinite(timeoutS) || timeoutS <= 0) throw new Error(`--timeout must be a positive number of seconds: ${args.timeout}`);
+  const version = envVersion(), mode = String(args.mode ?? "segment"), timeoutMs = timeoutS * 1000;
   const outDir = path.resolve(String(args.out ?? `bench-out/${B.PUDDING_GAME}-${new Date().toISOString().replace(/[:.]/g, "-")}`));
   fs.mkdirSync(outDir, { recursive: true });
   const env = new B.PuddingBenchEnv({ envVersion: version, actionMode: mode });
   const agent = new AgentProcess(args.agent);
   const rules = B.puddingRules(env.mode), results = [], traces = [];
-  let timeouts = 0;
-  for (const seed of seeds) {
+  let timeouts = 0, agentExited = null;
+  for (const [episode, seed] of seeds.entries()) {
     let obs = env.reset(seed), step = 0;
-    agent.send({ type: "reset", game: B.PUDDING_GAME, seed, track: env.track, actionMode: env.actionMode, envVersion: version, rules });
+    // 시드는 에이전트에게 보내지 않는다(판 번호만). 기록 파일에는 시드가 남는다.
+    agent.send({ type: "reset", game: B.PUDDING_GAME, episode, track: env.track, actionMode: env.actionMode, envVersion: version, rules });
     while (!env.isDone()) {
       agent.send({ type: "obs", step, obs });
-      const { action, timeout } = await readAction(agent, step, Date.now() + timeoutMs);
+      const { action, timeout, exited } = await readAction(agent, step, Date.now() + timeoutMs);
       if (timeout) timeouts++;
+      if (exited && !agentExited) agentExited = { episode, step };
       obs = env.step(action).obs;
       step++;
     }
     const result = env.result(), trace = env.trace(), file = `trace-seed-${seed}.json`;
-    agent.send({ type: "done", result });
+    const { seed: _seed, ...shown } = result;
+    agent.send({ type: "done", episode, result: shown });
     fs.writeFileSync(path.join(outDir, file), `${JSON.stringify(trace)}\n`);
     results.push(result); traces.push(file);
     console.error(`seed ${seed}: ${result.score} m, ${result.decisions} decisions, ${result.invalidActions} invalid`);
@@ -190,55 +211,100 @@ async function cmdRun(args) {
   await agent.stop();
   const summary = {
     format: SUMMARY_FORMAT, game: B.PUDDING_GAME, envVersion: version, track: env.track, actionMode: env.actionMode, agent: args.agent,
-    createdAt: new Date().toISOString(), timeouts, bootstrap: { resamples: BOOTSTRAP_RESAMPLES, seed: BOOTSTRAP_SEED },
+    createdAt: new Date().toISOString(), nodeVersion: process.version, timeouts, agentExited,
+    agentMeta: agent.meta, ...(agent.metaTruncated ? { agentMetaTruncated: true } : {}),
+    bootstrap: { resamples: BOOTSTRAP_RESAMPLES, seed: BOOTSTRAP_SEED },
     ...summarize(results), episodes: results.map((r, i) => ({ seed: r.seed, score: r.score, trace: traces[i], result: r })),
   };
   fs.writeFileSync(path.join(outDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
   console.log(`median ${summary.median} m (95% CI ${summary.ci95[0]}..${summary.ci95[1]}), ${seeds.length} seeds, ${summary.invalidActions} invalid, ${timeouts} timeouts`);
   console.log(`wrote ${outDir}`);
+  if (agentExited) {
+    console.error(`agent exited at episode ${agentExited.episode}, step ${agentExited.step}; the remaining decisions were invalid`);
+    process.exitCode = 1;
+  }
 }
 
 /** 기록 하나를 다시 돌린다. 문제가 있으면 { error } . */
 function verifyTrace(trace, version) {
-  if (!trace || typeof trace !== "object") return { error: "not an object" };
+  if (!trace || typeof trace !== "object" || Array.isArray(trace)) return { error: "not an object" };
   if (trace.format !== B.BENCH_TRACE_FORMAT) return { error: `format ${trace.format} is not ${B.BENCH_TRACE_FORMAT}` };
   if (trace.game !== B.PUDDING_GAME) return { error: `unknown game ${trace.game}` };
   if (trace.envVersion !== version) return { error: `envVersion ${trace.envVersion} does not match this checkout (${version})`, versionMismatch: true };
-  if (!Number.isSafeInteger(trace.seed) || trace.seed < 0) return { error: "bad seed" };
+  if (!isSeed(trace.seed)) return { error: "bad seed" };
   if (trace.track !== "state") return { error: `track ${trace.track} is not supported` };
   if (!B.parsePuddingActionMode(String(trace.actionMode))) return { error: `bad actionMode ${trace.actionMode}` };
   try { return { result: B.replay(B.puddingEnvFor(trace, version), trace) }; }
   catch (error) { return { error: String(error?.message ?? error) }; }
 }
 
+/** 요약 폴더 안의 상대 경로만 받는다(절대 경로 · `..` 거부). */
+function traceFileIn(dir, rel) {
+  if (typeof rel !== "string" || !rel || path.isAbsolute(rel) || rel.split(/[\\/]/).includes("..")) return null;
+  const full = path.resolve(dir, rel);
+  return full.startsWith(path.resolve(dir) + path.sep) ? full : null;
+}
+
+/** 요약 하나: 칸 확인 → 기록마다 다시 돌리기 → 통계 다시 계산과 비교. 실패 까닭 목록을 돌려준다. */
+function verifySummary(file, doc, version, seedSet, say) {
+  const fails = [], dir = path.dirname(path.resolve(file));
+  const fail = msg => { fails.push(msg); say(file, `FAIL ${msg}`); };
+  if (doc.game !== B.PUDDING_GAME) fail(`game ${doc.game} is not ${B.PUDDING_GAME}`);
+  if (doc.envVersion !== version) fail(`summary envVersion ${doc.envVersion} does not match ${version}`);
+  if (doc.track !== "state") fail(`track ${doc.track} is not supported`);
+  const mode = B.parsePuddingActionMode(String(doc.actionMode));
+  if (!mode || B.actionModeName(mode) !== doc.actionMode) fail(`bad actionMode ${doc.actionMode}`);
+  const episodes = Array.isArray(doc.episodes) ? doc.episodes : [];
+  if (!episodes.length) fail("summary has no episodes");
+  const results = [], seenFiles = new Set(), seenSeeds = new Set();
+  for (const [i, e] of episodes.entries()) {
+    const where = `episode ${i}`;
+    if (!e || typeof e !== "object") { fail(`${where}: not an object`); continue; }
+    const tf = traceFileIn(dir, e.trace);
+    if (!tf) { fail(`${where}: trace path must be relative and inside the summary folder: ${e.trace}`); continue; }
+    if (seenFiles.has(tf)) { fail(`${where}: trace ${e.trace} is listed twice`); continue; }
+    seenFiles.add(tf);
+    if (typeof e.score !== "number") { fail(`${where}: score is missing`); continue; }
+    let trace;
+    try { trace = JSON.parse(fs.readFileSync(tf, "utf8")); } catch { fail(`${where}: cannot read trace ${e.trace}`); continue; }
+    const r = verifyTrace(trace, version);
+    if (r.error) { fail(`${where} (${e.trace}): ${r.error}`); continue; }
+    if (trace.actionMode !== doc.actionMode) { fail(`${where}: trace actionMode ${trace.actionMode} is not the summary's ${doc.actionMode}`); continue; }
+    if (e.seed !== trace.seed) { fail(`${where}: seed ${e.seed} is not the trace's seed ${trace.seed}`); continue; }
+    if (seenSeeds.has(trace.seed)) { fail(`${where}: seed ${trace.seed} is listed twice`); continue; }
+    seenSeeds.add(trace.seed);
+    const ok = e.score === r.result.score && JSON.stringify(e.result) === JSON.stringify(r.result);
+    if (!ok) fail(`${where}: claimed score ${e.score} / result do not match the replay (${r.result.score} m)`);
+    say(tf, `${ok ? "OK" : "MISMATCH"} seed ${trace.seed} ${r.result.score} m (claimed ${e.score}), ${r.result.decisions} decisions, ${r.result.invalidActions} invalid`);
+    results.push(r.result);
+  }
+  if (seedSet) {
+    const want = [...new Set(seedSet)].sort((a, b) => a - b), got = [...seenSeeds].sort((a, b) => a - b);
+    if (JSON.stringify(want) !== JSON.stringify(got)) fail(`seeds ${JSON.stringify(got)} are not the seeds file's ${JSON.stringify(want)}`);
+  }
+  if (!fails.length && results.length) {
+    const re = summarize(results);
+    for (const [k, v] of Object.entries(re)) {
+      if (JSON.stringify(doc[k]) !== JSON.stringify(v)) fail(`${k} ${JSON.stringify(doc[k])} is not the recomputed ${JSON.stringify(v)}`);
+    }
+    if (!fails.length) say(file, `OK median ${re.median} m (95% CI ${re.ci95[0]}..${re.ci95[1]}) over ${results.length} traces`);
+  }
+  return fails;
+}
+
 function cmdVerify(args) {
   const version = envVersion();
+  const seedSet = typeof args["seeds-file"] === "string" ? readSeedsFile(args["seeds-file"]) : null;
   let failed = false;
   const say = (file, msg) => console.log(`${file}: ${msg}`);
   for (const file of args._) {
     let doc;
     try { doc = JSON.parse(fs.readFileSync(file, "utf8")); } catch (error) { failed = true; say(file, `cannot read JSON (${error.message})`); continue; }
-    const items = doc?.format === SUMMARY_FORMAT
-      ? (doc.episodes ?? []).map(e => ({ file: path.join(path.dirname(file), String(e.trace)), claimed: e.score }))
-      : [{ file, claimed: undefined, doc }];
-    if (doc?.format === SUMMARY_FORMAT && doc.envVersion !== version) { failed = true; say(file, `summary envVersion ${doc.envVersion} does not match ${version}`); }
-    const scores = [];
-    for (const item of items) {
-      let trace = item.doc;
-      if (!trace) { try { trace = JSON.parse(fs.readFileSync(item.file, "utf8")); } catch (error) { failed = true; say(item.file, `cannot read trace (${error.message})`); continue; } }
-      const r = verifyTrace(trace, version);
-      if (r.error) { failed = true; say(item.file, `FAIL ${r.error}`); continue; }
-      scores.push(r.result.score);
-      const mismatch = item.claimed !== undefined && item.claimed !== r.result.score;
-      if (mismatch) failed = true;
-      say(item.file, `${mismatch ? "MISMATCH" : "OK"} seed ${trace.seed} ${r.result.score} m${item.claimed !== undefined ? ` (claimed ${item.claimed})` : ""}, `
-        + `${r.result.decisions} decisions, ${r.result.invalidActions} invalid, ${JSON.stringify(r.result.stats)}`);
-    }
-    if (doc?.format === SUMMARY_FORMAT && scores.length) {
-      const med = median(scores), ok = med === doc.median;
-      if (!ok) failed = true;
-      say(file, `${ok ? "OK" : "MISMATCH"} median ${med} m (claimed ${doc.median}) over ${scores.length} traces`);
-    }
+    if (doc?.format === SUMMARY_FORMAT) { if (verifySummary(file, doc, version, seedSet, say).length) failed = true; continue; }
+    const r = verifyTrace(doc, version);
+    if (r.error) { failed = true; say(file, `FAIL ${r.error}`); continue; }
+    say(file, `OK seed ${doc.seed} ${r.result.score} m, ${r.result.decisions} decisions, ${r.result.invalidActions} invalid, ${JSON.stringify(r.result.stats)}`);
+    if (seedSet && !seedSet.includes(doc.seed)) { failed = true; say(file, `FAIL seed ${doc.seed} is not in the seeds file`); }
   }
   if (!args._.length) { console.error("verify needs trace or summary files"); failed = true; }
   process.exitCode = failed ? 1 : 0;

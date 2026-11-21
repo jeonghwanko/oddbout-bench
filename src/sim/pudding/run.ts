@@ -34,6 +34,18 @@ export const SPOON_PERIOD = 0.7;
 export const STEP = 1 / 120;
 /** 땅에서 달릴 때 · 누를 때 · 공중 · 공중에서 누를 때(내리꽂기)의 중력. */
 export const G_RUN = 600, G_HOLD = 1200, G_AIR = 560, G_DIVE = 1400;
+/** 공중 끌림(초당 vx 의 몫)과 피버 동안 공중 중력 배율. */
+export const AIR_DRAG = 0.015, FEVER_GRAVITY = 0.85;
+/**
+ * 땅에서 뗀 점프의 세기(`launchVelocity`): pop = (기본 + 게이지 몫 × 게이지) × (1 + 골짜기 × 골짜기 몫) × (1 + 단계 몫 × min(단계, 단계 상한)).
+ * 속도는 경사 방향 땅 속력에 pop 을 앞(경사 몫 + 평지 몫)과 위로 나눠 더한다.
+ */
+export const LAUNCH_POP_BASE = 200, LAUNCH_POP_CHARGE = 190, LAUNCH_VALLEY_GAIN = 0.5, LAUNCH_STAGE_GAIN = 0.04, STAGE_GAIN_MAX = 8;
+export const LAUNCH_FWD_SLOPE = 0.6, LAUNCH_FWD = 0.4, LAUNCH_UP = 0.8;
+/** 골짜기 보너스(`valleyAt`): min(상한, max(0, −곡률 × v² / 나눔)). */
+export const VALLEY_MAX = 0.8, VALLEY_DIV = 700;
+/** 땅 속력 상한(`speedCapOf`): 기본 + 단계 몫 × min(단계, 단계 상한) + 피버 몫(피버 중) + 젤리 특성 `capAdd`. */
+export const SPEED_CAP_BASE = 520, SPEED_CAP_STAGE = 35, SPEED_CAP_FEVER = 80;
 /** 이 시간(초) 이상 누르면 게이지가 다 찬다. */
 export const FULL_HOLD = 0.35;
 /** 이보다 짧게 난 튐은 착지 판정을 하지 않는다(초). */
@@ -316,9 +328,12 @@ export const distanceM = (s: PuddingRun): number => Math.max(0, Math.floor(s.wx 
 export const speedOf = (s: PuddingRun): number => s.grounded ? s.v : Math.hypot(s.vx, s.vy);
 /** 숟가락이 떠낸 푸딩 끝. */
 export const spoonCutX = (s: PuddingRun): number => s.spoonX + 8;
+/** 땅 속력 상한: 변신 단계 · 피버 · 젤리 특성으로 늘어난다. 땅 걸음, 뛰는 순간(`setHold`), 생크림 튕김에 건다. */
+export const speedCapOf = (s: PuddingRun): number =>
+  SPEED_CAP_BASE + SPEED_CAP_STAGE * Math.min(s.stage, STAGE_GAIN_MAX) + (s.feverT > 0 ? SPEED_CAP_FEVER : 0) + s.traits.capAdd;
+/** 뛰는 속력: 땅 속력을 상한으로 자른 값. 발사와 골짜기 보너스가 함께 쓴다. */
+export const launchSpeedOf = (s: PuddingRun): number => Math.min(speedCapOf(s), s.v);
 /** 게이지가 다 차는 시간(초): `FULL_HOLD` × 젤리 특성 `chargeTime`. */
-/** 땅 속력 상한: 변신 단계 · 피버 · 젤리 특성으로 늘어난다. 땅 걸음과 뛰는 순간(`setHold`)에 건다. */
-export const speedCapOf = (s: PuddingRun): number => 520 + 35 * Math.min(s.stage, 8) + (s.feverT > 0 ? 80 : 0) + s.traits.capAdd;
 export const fullHoldOf = (s: PuddingRun): number => FULL_HOLD * s.traits.chargeTime;
 /** 게이지 0..1. */
 export const chargeOf = (s: PuddingRun): number => Math.min(1, s.holdT / fullHoldOf(s));
@@ -333,11 +348,11 @@ function addCoin(s: PuddingRun): void {
   s.stats.gold += whole; s.goldFrac -= whole;
 }
 /** 골짜기(오목)에서 빠르게 누를수록 커지는 튕김 보너스 0..0.8. */
-export function valleyOf(s: PuddingRun): number { return valleyAt(s.terrain, s.wx, s.v); }
+export function valleyOf(s: PuddingRun): number { return valleyAt(s.terrain, s.wx, launchSpeedOf(s)); }
 /** `wx` 자리에서 속력 `v` 로 뛸 때의 골짜기 보너스 0..0.8. */
 export function valleyAt(t: Terrain, wx: number, v: number): number {
   const sl = slope(t, wx), k = curv(t, wx) / Math.pow(1 + sl * sl, 1.5);
-  return Math.max(0, Math.min(0.8, -k * v * v / 700));
+  return Math.max(0, Math.min(VALLEY_MAX, -k * v * v / VALLEY_DIV));
 }
 /**
  * 땅에서 뗀 점프의 속도. 오래 누를수록(`charge` 0..1), 골짜기일수록(`valley`), 변신 단계가 높을수록 푸딩이 더 세게 튕긴다.
@@ -347,8 +362,9 @@ export function valleyAt(t: Terrain, wx: number, v: number): number {
 export function launchVelocity(v: number, sl: number, charge: number, valley: number, stage: number,
   traits: Pick<JellyTraits, "jump" | "chargePower"> = BEAR_TRAITS): { vx: number; vy: number } {
   const ang = Math.atan(sl), cs = Math.cos(ang), sn = Math.sin(ang);
-  const pop = (200 + 190 * charge * traits.chargePower) * (1 + valley * 0.5) * (1 + 0.04 * Math.min(stage, 8)) * traits.jump;
-  return { vx: v * cs + sn * pop * 0.6 + pop * 0.4, vy: v * sn - pop * 0.8 };
+  const pop = (LAUNCH_POP_BASE + LAUNCH_POP_CHARGE * charge * traits.chargePower) * (1 + valley * LAUNCH_VALLEY_GAIN)
+    * (1 + LAUNCH_STAGE_GAIN * Math.min(stage, STAGE_GAIN_MAX)) * traits.jump;
+  return { vx: v * cs + sn * pop * LAUNCH_FWD_SLOPE + pop * LAUNCH_FWD, vy: v * sn - pop * LAUNCH_UP };
 }
 
 /**
@@ -365,7 +381,7 @@ export function placeStars(t: Terrain, stage: number, traits: JellyTraits = BEAR
     const path: [number, number][] = [];
     const ga = G_AIR * traits.gravity;
     for (let i = 1; i <= Math.ceil(STAR_T1 / STEP); i++) {
-      vy += ga * STEP; vx -= vx * 0.015 * STEP;
+      vy += ga * STEP; vx -= vx * AIR_DRAG * STEP;
       x += vx * STEP; y += vy * STEP;
       path.push([x, y - 12]);
       const at = STAR_T0 + (STAR_T1 - STAR_T0) * next / Math.max(1, STAR_COINS - 1);
@@ -411,11 +427,12 @@ export function setHold(s: PuddingRun, on: boolean): PuddingEvent[] {
   if (on) { s.holdT = 0; s.full = false; return events; }
   if (s.grounded && s.caughtT < 0 && s.bonkT <= 0) {
     const full = s.holdT >= fullHoldOf(s), sl = slope(s.terrain, s.wx);
+    // 땅 속력 상한은 뛸 때도 건다(발사 속력과 골짜기 보너스 둘 다, `launchSpeedOf`). PERFECT 착지는 상한을 넘는 속력을 주고 상한은 땅 걸음에서만 걸린다.
+    // 타격 경직(`freeze`) 중에는 땅 걸음이 돌지 않으므로, 여기서 자르지 않으면 경직 중에 떼어 PERFECT 를 이을 때마다 속력이 끝없이 커진다(2026-11-21).
+    const v = launchSpeedOf(s);
     const charge = chargeOf(s), valley = valleyOf(s), assisted = assistArmed(s);
     // 톡 떼도 뛴다(`launchVelocity`). 첫 변신 도움 점프는 게이지가 덜 찼어도 꽉 찬 세기로 뛰고, 변신 높이에 닿도록 최소 상승 속도를 준다.
-    // 땅 속력 상한은 뛸 때도 건다. PERFECT 착지는 상한을 넘는 속력을 주고 상한은 땅 걸음에서만 걸린다.
-    // 타격 경직(`freeze`) 중에는 땅 걸음이 돌지 않으므로, 여기서 자르지 않으면 경직 중에 떼어 PERFECT 를 이을 때마다 속력이 끝없이 커진다(2026-11-21).
-    const l = launchVelocity(Math.min(speedCapOf(s), s.v), sl, assisted ? 1 : charge, valley, s.stage, s.traits);
+    const l = launchVelocity(v, sl, assisted ? 1 : charge, valley, s.stage, s.traits);
     s.vx = l.vx; s.vy = l.vy;
     if (assisted) s.vy = Math.min(s.vy, -ASSIST_RISE);
     takeOff(s);
@@ -478,7 +495,9 @@ function land(s: PuddingRun, gy: number, events: PuddingEvent[]): void {
 function creamBounce(s: PuddingRun, g: LandingGrade, cs: number, sn: number, events: PuddingEvent[]): void {
   const pop = CREAM_POP[g];
   if (pop <= 0) return;
-  s.vx = s.v * cs; s.vy = s.v * sn - pop;
+  // 다시 띄우는 속력에도 땅 속력 상한을 건다(뛰는 순간 `setHold` 와 같다). PERFECT 가 준 상한 넘는 속력으로 튕기지 않는다(2026-11-21).
+  const v = launchSpeedOf(s);
+  s.vx = v * cs; s.vy = v * sn - pop;
   takeOff(s);
   s.facts.creamBounces++;
   events.push({ kind: "bounce", grade: g, x: s.wx });
@@ -527,8 +546,8 @@ export function predictLanding(s: PuddingRun, hold: boolean = s.hold, maxT: numb
     const dash = dashT > 0 ? 3 : 1;
     if (dashT > 0) { dashT -= STEP; if (dashT <= 0) freeze = 0.04; }
     airT += STEP;
-    const ga = (hold ? G_DIVE : G_AIR) * (fever > 0 ? 0.85 : 1) * s.traits.gravity;
-    vy += ga * STEP; vx -= vx * 0.015 * STEP;
+    const ga = (hold ? G_DIVE : G_AIR) * (fever > 0 ? FEVER_GRAVITY : 1) * s.traits.gravity;
+    vy += ga * STEP; vx -= vx * AIR_DRAG * STEP;
     wx += vx * STEP * dash; y += vy * STEP;
     const gy = hill(s.terrain, wx);
     if (y >= gy) {
@@ -646,8 +665,8 @@ export function stepRun(s: PuddingRun, dt: number, playing: boolean): StepResult
   } else {
     s.airT += dt;
     if (s.hold) s.facts.airHoldT += dt;
-    const ga = (s.hold ? G_DIVE : G_AIR) * (s.feverT > 0 ? 0.85 : 1) * s.traits.gravity;
-    s.vy += ga * dt; s.vx -= s.vx * 0.015 * dt;
+    const ga = (s.hold ? G_DIVE : G_AIR) * (s.feverT > 0 ? FEVER_GRAVITY : 1) * s.traits.gravity;
+    s.vy += ga * dt; s.vx -= s.vx * AIR_DRAG * dt;
     s.wx += s.vx * dt * dash; s.y += s.vy * dt;
     const gy = hill(s.terrain, s.wx);
     if (s.y >= gy) land(s, gy, events);

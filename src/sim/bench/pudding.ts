@@ -14,8 +14,10 @@
  */
 import { nextFloat } from "../rng";
 import {
-  type LandingGrade, type PuddingEvent, type PuddingRun, STEP, chargeOf, createRun, distanceM, fullHoldOf, setHold, spoonSpeedOf, startRun,
-  stepRun, transformBurst, transformEnd,
+  AIR_DRAG, CATCH_GAP, FEVER_GRAVITY, FULL_HOLD, GOOD_ANGLE, GRADED_AIR, G_AIR, G_DIVE, G_HOLD, G_RUN, LAUNCH_FWD, LAUNCH_FWD_SLOPE,
+  LAUNCH_POP_BASE, LAUNCH_POP_CHARGE, LAUNCH_STAGE_GAIN, LAUNCH_UP, LAUNCH_VALLEY_GAIN, type LandingGrade, PERFECT_ANGLE, type PuddingEvent,
+  type PuddingRun, SPEED_CAP_BASE, SPEED_CAP_FEVER, SPEED_CAP_STAGE, SPOON_ACCEL, SPOON_ACCEL2, SPOON_LEASH, SPOON_MAX, SPOON_V0, STAGE_GAIN_MAX,
+  STEP, VALLEY_DIV, VALLEY_MAX, chargeOf, createRun, distanceM, fullHoldOf, setHold, spoonSpeedOf, startRun, stepRun, transformBurst, transformEnd,
 } from "../pudding/run";
 import { type FeatureKind, type Terrain, genTo, hill, slope } from "../pudding/terrain";
 import { BENCH_TRACE_FORMAT, type BenchEnv, type BenchResult, type BenchStep, type BenchTrace } from "./types";
@@ -38,7 +40,9 @@ export const INTERVAL_DEFAULT = 8, INTERVAL_MIN = 1, INTERVAL_MAX = 60;
 /** 관찰의 앞 지형: `LOOKAHEAD_M` m 앞까지 `SAMPLE_M` m 마다. */
 export const LOOKAHEAD_M = 100, SAMPLE_M = 2;
 /** 월드 x 10 이 1 m 다. */
-const PER_M = 10;
+export const PER_M = 10;
+/** 시드 범위: 규칙의 시드 PRNG 가 32비트라 이 범위 밖의 시드는 다른 시드와 같은 판이 된다. */
+export const PUDDING_SEED_MAX = 2 ** 32 - 1;
 
 /** ms 를 걸음 수로: 범위로 자른 뒤 `Math.round(ms × 120 / 1000)`(반 걸음은 위로). */
 export function msToSteps(ms: number, maxMs: number): number {
@@ -185,7 +189,7 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
   }
 
   reset(seed: number): PuddingObs {
-    if (!Number.isSafeInteger(seed) || seed < 0) throw new Error(`seed must be a non-negative safe integer: ${seed}`);
+    if (!Number.isSafeInteger(seed) || seed < 0 || seed > PUDDING_SEED_MAX) throw new Error(`seed must be an integer 0..${PUDDING_SEED_MAX}: ${seed}`);
     const run = createRun(seed);
     startRun(run, seed, false);
     this.st = { run, seed, steps: 0, done: false, caught: false, decisions: 0, invalid: 0, actions: [], seg: EMPTY_SEGMENT };
@@ -290,7 +294,7 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
     if (st.run.grounded) this.advance(log);
   }
 
-  /** 공중 행동: 뜬 뒤 `pressAt` 걸음째부터 누르고 내려앉을 때까지 버틴다. null 이면 이번 비행에서 누르지 않는다. */
+  /** 공중 행동: 이 결정 시각(보통 뜬 순간)에서 `pressAt` 걸음째부터 누르고 내려앉을 때까지 버틴다. null 이면 이번 결정 동안 누르지 않는다. */
   private runAir(pressAt: number | null, log: PuddingEvent[]): void {
     const st = this.s;
     for (let i = 0; !st.done; i++) {
@@ -397,8 +401,29 @@ export function puddingEnvFor(trace: Pick<BenchTrace, "actionMode">, envVersion:
   return new PuddingBenchEnv({ envVersion, actionMode: trace.actionMode });
 }
 
+/**
+ * 규칙 글의 물리 상수와 식(`puddingRules().physics`). 숫자는 규칙(`sim/pudding/run.ts`)의 export 상수에서 만든다. 값을 여기 다시 적지 않는다.
+ * 줄마다 하나의 식이다. `test/bench-pudding.test.ts` 가 발사 식 줄을 읽어 `launchVelocity` 와 같은지 본다.
+ */
+export function puddingPhysics(): readonly string[] {
+  return [
+    `Units: the rules run in game units, ${PER_M} units = 1 m, game y points DOWN, one step = 1/${STEPS_PER_S} s (fixed). Here slope = dy/dx with y down = -obs.terrain.slope (a ratio, same in m). Observations convert to m, m/s and up-positive.`,
+    `Gravity (units/s^2, down): ground ${G_RUN}, ground while holding ${G_HOLD}, air ${G_AIR}, air while holding (dive) ${G_DIVE}; during fever air gravity x${FEVER_GRAVITY}.`,
+    `Air motion each step (dt = one step): vy += g*dt; vx -= vx*${AIR_DRAG}*dt; x += vx*dt; y += vy*dt; it lands when y reaches the ground.`,
+    `Charge: full after ${FULL_HOLD} s of holding on the ground (charge = min(1, holdS/fullHoldS)); time in hit-stop or stumble does not count.`,
+    `Landing grade: d = |atan2(vy, vx) - atan(slope)| (game units, y down). PERFECT if d < ${PERFECT_ANGLE}, GOOD if d < ${GOOD_ANGLE}, else SPLAT. Flights shorter than ${GRADED_AIR} s are not graded.`,
+    `Speed cap (units/s): cap = ${SPEED_CAP_BASE} + ${SPEED_CAP_STAGE}*min(stage, ${STAGE_GAIN_MAX}) + (fever ? ${SPEED_CAP_FEVER} : 0). Ground speed is clamped to cap every ground step and when jumping.`,
+    `Launch: v = min(cap, groundSpeed); a = atan(slope); pop = (${LAUNCH_POP_BASE} + ${LAUNCH_POP_CHARGE}*charge) * (1 + ${LAUNCH_VALLEY_GAIN}*valley) * (1 + ${LAUNCH_STAGE_GAIN}*min(stage, ${STAGE_GAIN_MAX})); `
+      + `vx = v*cos(a) + pop*(${LAUNCH_FWD_SLOPE}*sin(a) + ${LAUNCH_FWD}); vy = v*sin(a) - ${LAUNCH_UP}*pop.`,
+    `Valley bonus: valley = min(${VALLEY_MAX}, max(0, -k*v^2/${VALLEY_DIV})), k = y''/(1 + slope^2)^1.5 (negative in a valley bottom).`,
+    `Spoon speed (units/s): min(${SPOON_MAX}, ${SPOON_V0} + ${SPOON_ACCEL}*t + ${SPOON_ACCEL2}*t^2), t = run time in s; it never falls more than ${SPOON_LEASH} units behind; caught when the gap <= ${CATCH_GAP} units.`,
+  ];
+}
+
 /** 에이전트에게 보내는 짧은 규칙 글(프로토콜 `reset` 의 `rules`). */
-export function puddingRules(mode: PuddingActionMode): { readonly summary: string; readonly actionSchema: string; readonly observation: string } {
+export function puddingRules(mode: PuddingActionMode): {
+  readonly summary: string; readonly actionSchema: string; readonly observation: string; readonly physics: readonly string[];
+} {
   return {
     summary: "Pudding Escape: a jelly slides over endless pudding hills while a spoon chases it. Score = distance (m) when the spoon catches it or at 300 s game time. "
       + "Hold on the ground to charge (full charge after fullHoldS), release on the ground to jump. Land matching the slope angle: PERFECT (<0.3 rad) gives speed and combo, "
@@ -407,10 +432,11 @@ export function puddingRules(mode: PuddingActionMode): { readonly summary: strin
     actionSchema: mode.kind === "segment"
       ? "segment mode. When obs.decision is \"ground\": {\"waitMs\":0..3000,\"holdMs\":0..1500} = stay released waitMs, press holdMs, release (jump). "
         + "If obs.holding is true, waitMs must be 0 (holding continues holdMs more, then release). When obs.decision is \"air\": {\"pressAfterMs\":0..3000 or null} = "
-        + "press (dive) pressAfterMs after liftoff and keep holding through landing, or null = do not press this flight. "
+        + "press (dive) pressAfterMs after this decision (normally the liftoff) and keep holding through landing, or null = do not press during this action. "
         + "A segment ends early at the next decision point. Out-of-range numbers are clamped; ms round to 1/120 s steps. Invalid actions count and keep the current hold for 250 ms."
       : `interval mode (k=${mode.k} steps of 1/120 s). Action {"hold":true|false} is applied for k steps. Invalid actions count and keep the current hold for k steps.`,
     observation: "Lengths m, speeds m/s, times s. Heights and slopes: up is positive. terrain.heightM[i]/slope[i] are at i*stepM metres ahead, height relative to the jelly's feet. "
       + "features: kind with startM/endM relative to the jelly. lastSegment summarises what happened during your previous action.",
+    physics: puddingPhysics(),
   };
 }

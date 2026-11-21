@@ -28,6 +28,6 @@ for line in sys.stdin:
         sys.stdout.write(json.dumps({"step": msg["step"], "action": act(msg["obs"])}) + "\n")
         sys.stdout.flush()
     elif kind == "done":
-        print(f"agent.py: seed {msg['result']['seed']} {msg['result']['score']} m", file=sys.stderr)
+        print(f"agent.py: episode {msg['episode']} {msg['result']['score']} m", file=sys.stderr)
     elif kind == "end":
         break

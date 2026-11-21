@@ -7,21 +7,27 @@ The first environment is **Pudding Escape** ([play it](https://pudding.oddbout.c
 A jelly slides over endless pudding hills while a spoon chases it. Hold to charge, release to jump, and land at the angle of the slope.
 It tests physical prediction and timing — when to press, and when to let go.
 
-No dependencies. Node 22.18 or newer runs the TypeScript rules directly.
+No runtime dependencies. `npm install` is only needed for lint and typecheck. Node 22.18 or newer runs the TypeScript rules directly.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/jeonghwanko/oddbout-bench.git
 cd oddbout-bench
+npm install                                                # optional; only lint and typecheck need it
+npm test && npm run lint && npm run typecheck
 node tools/bench/bench.mjs baselines                       # reference scores (seeds 1-50)
-node tools/bench/bench.mjs run --agent "node tools/bench/examples/heuristic-agent.mjs" --seeds 1-10 --out bench-out/heuristic
+node tools/bench/bench.mjs run --seeds 1-10 --out bench-out/heuristic -- node tools/bench/examples/heuristic-agent.mjs
 node tools/bench/bench.mjs verify bench-out/heuristic/summary.json
-node tools/bench/bench.mjs compare bench-out/a/summary.json bench-out/b/summary.json   # paired comparison on the same seeds
+node tools/bench/bench.mjs compare bench-out/a/summary.json bench-out/b/summary.json   # verifies both summaries, then pairs the same seeds
 ```
 
 Your agent is any program that reads JSON lines on stdin and writes JSON lines on stdout. Any language works.
-See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-agent.mjs`), a Python agent (`agent.py`), and an LLM agent (`claude-agent.mjs`, Anthropic Messages API, needs `ANTHROPIC_API_KEY`; pass `--no-fallbacks` for an official run so every answer comes from the named model).
+See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-agent.mjs`), a Python agent (`agent.py`), and an LLM agent (`claude-agent.mjs`, Anthropic Messages API, needs `ANTHROPIC_API_KEY` in the environment; pass `--no-fallbacks` for an official run so every answer comes from the named model).
+
+Pass the executable and its arguments after `--` to launch it directly. The legacy `--agent "<command>"` form runs a trusted local command through a shell. Both forms run with your local user permissions. Supply API keys through the environment. Saved commands, action strings and agent metadata mask recognized credential fields and key patterns.
+
+The contract is in [`docs/kaito-web/game-benchmark.md`](docs/kaito-web/game-benchmark.md).
 
 ## How it works
 
@@ -31,8 +37,8 @@ See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-ag
 - **Headline** = mean normalised score over seeds with a bootstrap 95% interval. Summaries also report the escape rate, PERFECT %, invalid-action rate and median distance (for reference). `interval` runs are normalised against the same segment references.
 - **Deterministic.** The same seed and the same actions always give the same result. Terrain shape and features depend only on the seed. Star coin positions also depend on the transform stage when that stretch of terrain is generated.
 - **Versioned.** `envVersion` is a hash of the environment sources: the files reachable by relative imports from `src/sim/bench/index.ts` (line endings normalised). A trace from a different version is rejected.
-- **Official ranking** uses `segment` mode. `interval` mode is for reference.
-- **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes every score and statistic. Repeated traces or seeds, missing scores and paths outside the summary folder fail.
+- **Official ranking** uses `segment` mode. `interval` mode is for reference. `--official` (on `run` and `verify`) rejects any other mode.
+- **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes scores, statistics and any recorded seed commitment. Trace files must resolve inside the summary folder. `compare` verifies both summaries against this checkout before pairing them.
 
 ### Protocol
 
@@ -45,12 +51,12 @@ Environment → agent, one JSON object per line:
 {"type":"end"}
 ```
 
-Agent → environment: `{"step": <same step>, "action": <action>}` for every `obs`. `step` is required: lines without the current `step`, and lines that are not JSON, are ignored until the deadline (default 300 s per decision, `--timeout`).
+For each `obs`, the agent returns `{"step": <same step>, "action": <action>}`. The runner starts `step` at 0 and increments it across the entire run. It waits for a matching JSON reply until the deadline (default 300 s per decision, `--timeout`) and ignores lines over 64 KiB.
 
 - The agent is never told the seed (only the episode number). Traces and the summary record it.
 - `rules.physics` lists the physical constants and formulas (gravity, drag, charge time, landing angles, launch, speed cap, spoon speed, units), generated from the rule code.
 - An agent may send `{"type":"meta", …}` at any time (for example model name and token counts). It is stored as `agentMeta` in the summary (up to 4 KB). It is **self-reported** and not verified.
-- If the agent process exits, the remaining decisions are invalid, the summary records `agentExited`, and `run` exits with code 1.
+- If the agent disconnects during a decision, the remaining decisions are invalid, the summary records `agentExited`, and `run` exits with code 1.
 
 ### Action modes
 
@@ -67,7 +73,7 @@ Time, distance, position and velocity, ground speed, grounded/holding, charge, s
 
 ## Reference scores
 
-Seeds 1–50, 90 s cap, envVersion `52f6ef79b672` (measured 2026-11-21).
+Seeds 1–50, 90 s cap, envVersion `f6a7f66a6884` (scores measured 2026-11-21; hash updated 2026-11-22 when `reset` began rejecting seed 0 — physics and scores on seeds 1..2^32−1 are unchanged).
 
 | Mode | Agent | Score | 95% CI | Escape % | PERFECT % | Median m |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -84,7 +90,7 @@ An agent that survives longer than the oracle scores above 100.
 ## Seeds
 
 Seeds 1–10 are public practice seeds. Official evaluation uses private seeds that are not in this repository, so results cannot be tuned to them.
-Seeds are integers 0..2^32−1. An official evaluation uses at least 50 seeds and runs in rounds:
+Seeds are integers 1..2^32−1. Seed 0 is rejected: `createRng(0)` is the same state as `createRng(2654435769)` (`0x9e3779b9`), so the two seeds would be the same episode. The mapping in `createRng` is left unchanged so scores on every valid seed stay the same. An official evaluation uses at least 50 seeds and runs in rounds:
 
 1. The evaluator publishes `node tools/bench/bench.mjs seeds-commit <seeds-file> --round <name>` (a sha256 of the sorted seeds and the round name).
 2. Runs use `run --seeds-file <seeds-file> --round <name> --official`. The summary records `seedsCommit`. `--official` refuses fewer than 50 seeds.
@@ -92,7 +98,7 @@ Seeds are integers 0..2^32−1. An official evaluation uses at least 50 seeds an
 
 ## Status
 
-- Done: state track, segment and interval modes, replay verification, baselines, example agents.
+- Done: state track, segment and interval modes, replay verification, baselines, example agents, tests, lint, CI.
 - Not yet: vision track (agents see the game screen), human baseline page, public leaderboard, more games.
 
 ## License

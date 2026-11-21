@@ -31,10 +31,10 @@ function ground(obs, xM) {
 /** `pressAt` 걸음째부터 누른다고 보고 착지까지 밟는다(m, 위가 +). 점수: 판정 × 1000 + 경사 방향 속력. */
 function scoreFlight(obs, pressAt) {
   const p = phys, dt = p.stepS, toM = 1 / p.perM;
-  let x = 0, y = obs.heightAboveGroundM, vx = obs.vxMps, vy = obs.vyMps, fever = obs.feverS, t = 0;
+  let x = 0, y = obs.heightAboveGroundM, vx = obs.vxMps, vy = obs.vyMps, fever = obs.feverS;
   for (let i = 0; i < 3 / dt; i++) {
     const g = (pressAt !== null && i >= pressAt ? p.gDive : p.gAir) * (fever > 0 ? p.feverG : 1) * toM;
-    fever -= dt; t += dt;
+    fever -= dt;
     vy -= g * dt; vx -= vx * p.drag * dt;
     x += vx * dt; y += vy * dt;
     const gr = ground(obs, x);

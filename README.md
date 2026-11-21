@@ -87,6 +87,8 @@ The case file stores a seed and action prefix. The runner replays the prefix and
 
 `verify` binds results to the SHA-256 of the case file and recomputes each outcome from its recorded action. `compare` checks both files, then pairs the same cases and reports distance differences and survival by category. A missing or invalid action follows the game's no-op rule and remains visible as a failure. Use `build --seeds-file <path>` to draw cases from a held-out seed pool.
 
+The output directory must exist. A run reserves its output path before launching agents and saves the result once all cases finish. If a run was forcibly terminated, remove the leftover `<output>.lock` directory after confirming the runner has stopped.
+
 ## Reference scores
 
 Seeds 1–50, 90 s cap, envVersion `f6a7f66a6884` (scores measured 2026-11-21; hash updated 2026-11-22 when `reset` began rejecting seed 0 — physics and scores on seeds 1..2^32−1 are unchanged).

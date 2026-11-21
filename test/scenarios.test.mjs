@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, rmdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -28,7 +28,13 @@ test("같은 사례를 재현하고, 정확한 3초 결과만 검증하고 비�
 
   const result = path.join(dir, "result.json");
   const args = ["run", "--cases", cases, "--out", result, "--jobs", "2", "--", process.execPath, "tools/bench/examples/heuristic-agent.mjs"];
+  mkdirSync(`${result}.lock`);
+  const reserved = command(args, 1);
+  assert.match(reserved.stderr, /result path is already reserved/);
+  assert.doesNotMatch(reserved.stderr, /episode 0/);
+  rmdirSync(`${result}.lock`);
   command(args);
+  assert.equal(existsSync(`${result}.lock`), false);
   assert.match(command(args, 1).stderr, /result file already exists/);
   const rows = readJson(result);
   assert.equal(rows.cases.length, 4);

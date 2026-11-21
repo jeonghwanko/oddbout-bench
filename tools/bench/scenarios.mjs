@@ -1,6 +1,7 @@
 import "./register-ts.mjs";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, linkSync, mkdirSync, readFileSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { parseArgs, isDeepStrictEqual } from "node:util";
 import { fileURLToPath } from "node:url";
 import { AgentProcess } from "./agent-process.mjs";
@@ -136,6 +137,43 @@ async function runCase(entry, argv, timeoutMs) {
   return { id: item.id, action: response.action, status, outcome, agentMeta: agent.meta };
 }
 
+async function runCases(set, argv, timeoutMs, jobs, out) {
+  const target = path.resolve(out);
+  if (existsSync(target)) throw new Error(`result file already exists: ${out}`);
+  const lock = `${target}.lock`;
+  try {
+    mkdirSync(lock);
+  } catch (error) {
+    if (error.code === "EEXIST") throw new Error(`result path is already reserved: ${lock}`);
+    throw error;
+  }
+  const staged = path.join(lock, "result.json");
+  try {
+    if (existsSync(target)) throw new Error(`result file already exists: ${out}`);
+    const cases = new Array(set.cases.length);
+    let next = 0;
+    const workers = await Promise.allSettled(Array.from({ length: Math.min(jobs, cases.length) }, async () => {
+      try {
+        while (next < cases.length) {
+          const i = next++;
+          cases[i] = await runCase(set.cases[i], argv, timeoutMs);
+        }
+      } catch (error) {
+        next = cases.length;
+        throw error;
+      }
+    }));
+    const failure = workers.find(result => result.status === "rejected");
+    if (failure) throw failure.reason;
+    write(staged, { format: RESULT_FORMAT, envVersion, caseSetSha256: set.hash, agent: redactAgentArgv(argv), cases });
+    linkSync(staged, target);
+    return cases;
+  } finally {
+    if (existsSync(staged)) unlinkSync(staged);
+    rmdirSync(lock);
+  }
+}
+
 function verifyResults(set, file) {
   const doc = JSON.parse(readFileSync(file, "utf8"));
   if (doc?.format !== RESULT_FORMAT || doc.caseSetSha256 !== set.hash || doc.envVersion !== envVersion
@@ -210,17 +248,8 @@ async function main([command, ...args]) {
   const set = loadCaseSet(values.cases);
   if (command === "run") {
     if (!values.out || !argv.length || positionals.length) throw new Error("run needs --out and an executable after --");
-    if (existsSync(values.out)) throw new Error(`result file already exists: ${values.out}`);
     const jobs = integer(values.jobs, "jobs", 8), timeoutMs = 1000 * integer(values.timeout, "timeout", 86400);
-    const cases = new Array(set.cases.length);
-    let next = 0;
-    await Promise.all(Array.from({ length: Math.min(jobs, cases.length) }, async () => {
-      while (next < cases.length) {
-        const i = next++;
-        cases[i] = await runCase(set.cases[i], argv, timeoutMs);
-      }
-    }));
-    write(values.out, { format: RESULT_FORMAT, envVersion, caseSetSha256: set.hash, agent: redactAgentArgv(argv), cases });
+    const cases = await runCases(set, argv, timeoutMs, jobs, values.out);
     console.log(JSON.stringify(stats(cases), null, 2));
   } else if (command === "verify" && positionals.length) {
     for (const file of positionals) console.log(`${file}: OK ${verifyResults(set, file).length} cases`);

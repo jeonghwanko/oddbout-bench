@@ -2,3 +2,5 @@
 export * from "./types";
 export * from "./pudding";
 export * from "./puddingBaselines";
+export * from "./puddingScore";
+export * from "./stats";

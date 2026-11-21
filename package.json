@@ -1,6 +1,6 @@
 {
   "name": "oddbout-bench",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Benchmark AI agents on ODDBOUT web games. Deterministic, replay-verified. First environment: Pudding Escape.",
   "license": "MIT",
   "private": true,

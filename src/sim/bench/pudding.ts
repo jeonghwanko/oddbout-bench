@@ -29,7 +29,7 @@ export const PUDDING_PRACTICE_SEEDS: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8
 /** 1 초의 걸음 수(`STEP` = 1/120 초). */
 export const STEPS_PER_S = Math.round(1 / STEP);
 /** 판의 게임 시간 상한(초)과 걸음 수. */
-export const PUDDING_CAP_S = 300;
+export const PUDDING_CAP_S = 90;
 export const PUDDING_CAP_STEPS = PUDDING_CAP_S * STEPS_PER_S;
 /** 행동 값의 범위(ms). 범위 밖의 유한한 수는 범위 끝으로 자른다. */
 export const WAIT_MAX_MS = 3000, HOLD_MAX_MS = 1500, PRESS_MAX_MS = 3000;
@@ -425,7 +425,8 @@ export function puddingRules(mode: PuddingActionMode): {
   readonly summary: string; readonly actionSchema: string; readonly observation: string; readonly physics: readonly string[];
 } {
   return {
-    summary: "Pudding Escape: a jelly slides over endless pudding hills while a spoon chases it. Score = distance (m) when the spoon catches it or at 300 s game time. "
+    summary: `Pudding Escape: a jelly slides over endless pudding hills while a spoon chases it. A run ends when the spoon catches it or at ${PUDDING_CAP_S} s game time. `
+      + "Each run is scored by its distance (m), normalised per seed between the random and oracle reference bots on a log scale (see the benchmark docs). "
       + "Hold on the ground to charge (full charge after fullHoldS), release on the ground to jump. Land matching the slope angle: PERFECT (<0.3 rad) gives speed and combo, "
       + "GOOD (<0.8 rad) keeps speed, SPLAT loses speed and stumbles (stumbleS: releasing does not jump). Holding in the air dives (stronger gravity). "
       + "Caramel slows you on the ground, cream re-launches a PERFECT/GOOD landing, stars reward a full-charge jump from a valley. Jumping high when transformReady transforms (faster).",

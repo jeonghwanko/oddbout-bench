@@ -14,9 +14,10 @@ No dependencies. Node 22.18 or newer runs the TypeScript rules directly.
 ```bash
 git clone https://github.com/jeonghwanko/oddbout-bench.git
 cd oddbout-bench
-node tools/bench/bench.mjs baselines --seeds 1-40          # reference scores
+node tools/bench/bench.mjs baselines                       # reference scores (seeds 1-50)
 node tools/bench/bench.mjs run --agent "node tools/bench/examples/heuristic-agent.mjs" --seeds 1-10 --out bench-out/heuristic
 node tools/bench/bench.mjs verify bench-out/heuristic/summary.json
+node tools/bench/bench.mjs compare bench-out/a/summary.json bench-out/b/summary.json   # paired comparison on the same seeds
 ```
 
 Your agent is any program that reads JSON lines on stdin and writes JSON lines on stdout. Any language works.
@@ -25,12 +26,13 @@ See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-ag
 ## How it works
 
 - **Turn-based.** The game does not advance while your agent thinks. Model latency does not change the score.
-- **Fixed conditions.** Default character, no items, no tutorial, no continues. A run ends when the spoon catches the jelly, or at 300 s of game time.
-- **Score** = distance in metres. Summaries report the median over seeds with a bootstrap 95% interval.
+- **Fixed conditions.** Default character, no items, no tutorial, no continues. A run ends when the spoon catches the jelly, or at 90 s of game time (an *escape*).
+- **Score.** Each run gets a log-normalised score: `100 × (ln d − ln d_random) / (ln d_oracle − ln d_random)`, where `d` is the run's distance and `d_random`, `d_oracle` are the distances of the `random` and `oracle` reference bots (segment mode) on the same seed. The reference bots are deterministic, so the environment computes them itself. Scores are not clipped: below random is negative, beyond oracle is above 100. Seeds where the oracle does not beat random are left out and listed.
+- **Headline** = mean normalised score over seeds with a bootstrap 95% interval. Summaries also report the escape rate, PERFECT %, invalid-action rate and median distance (for reference). `interval` runs are normalised against the same segment references.
 - **Deterministic.** The same seed and the same actions always give the same result. Terrain shape and features depend only on the seed. Star coin positions also depend on the transform stage when that stretch of terrain is generated.
 - **Versioned.** `envVersion` is a hash of the environment sources: the files reachable by relative imports from `src/sim/bench/index.ts` (line endings normalised). A trace from a different version is rejected.
 - **Official ranking** uses `segment` mode. `interval` mode is for reference.
-- **Verified.** `verify` replays every trace in a summary and recomputes every statistic. Repeated traces or seeds, missing scores and paths outside the summary folder fail.
+- **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes every score and statistic. Repeated traces or seeds, missing scores and paths outside the summary folder fail.
 
 ### Protocol
 
@@ -54,7 +56,7 @@ Agent → environment: `{"step": <same step>, "action": <action>}` for every `ob
 
 | Mode | Decisions per run | Action |
 | --- | --- | --- |
-| `segment` (default) | about 35–75 | On the ground: `{"waitMs":0..3000,"holdMs":0..1500}` — wait, hold to charge, release to jump. In the air: `{"pressAfterMs":0..3000 or null}` — dive that long after this decision (normally the liftoff) and hold through the landing, or do not press during this action. |
+| `segment` (default) | about 30–80 | On the ground: `{"waitMs":0..3000,"holdMs":0..1500}` — wait, hold to charge, release to jump. In the air: `{"pressAfterMs":0..3000 or null}` — dive that long after this decision (normally the liftoff) and hold through the landing, or do not press during this action. |
 | `interval:K` | about 250–300 for K=8 | `{"hold":true|false}` for K steps of 1/120 s (K = 1..60). |
 
 Malformed actions, timeouts, and crashes are recorded as invalid actions; they keep the current button state for a short time. The `rules` text in `reset` has the full schema.
@@ -65,26 +67,28 @@ Time, distance, position and velocity, ground speed, grounded/holding, charge, s
 
 ## Reference scores
 
-Seeds 1–40, envVersion `4fedac9d39ad` (measured 2026-11-21).
+Seeds 1–50, 90 s cap, envVersion `b8b220dc08dd` (measured 2026-11-21).
 
-| Mode | Agent | Median m | 95% CI |
-| --- | --- | --- | --- |
-| segment | `random` | 427 | 358–564 |
-| segment | `fullCharge` (always charge fully, never dive) | 743 | 605.5–815.5 |
-| segment | `heuristic-agent.mjs` (example; observations and `rules.physics` only) | 1,385.5 | 1,314.5–1,581.5 |
-| segment | `oracle` (searches with the internal rules; a ceiling, not a competitor) | 26,544.5 | 26,440.5–26,619.5 |
-| interval:8 | `random` | 595 | 520–663.5 |
-| interval:8 | `fullCharge` | 668 | 524–727 |
+| Mode | Agent | Score | 95% CI | Escape % | PERFECT % | Median m |
+| --- | --- | --- | --- | --- | --- | --- |
+| segment | `random` (reference, 0 by definition) | 0 | 0–0 | 0 | 2.6 | 435.5 |
+| segment | `fullCharge` (always charge fully, never dive) | 12.9 | 7.6–18.2 | 0 | 7.2 | 666.5 |
+| segment | `heuristic-agent.mjs` (example; observations and `rules.physics` only) | 44.2 | 41.0–47.5 | 0 | 15.4 | 1,374 |
+| segment | `oracle` (reference, 100 by definition; searches with the internal rules) | 100 | 100–100 | 100 | 85.9 | 7,313 |
+| interval:8 | `random` | 9.6 | 5.5–13.9 | 0 | 5.0 | 597 |
+| interval:8 | `fullCharge` | 9.1 | 4.1–14.1 | 0 | 7.2 | 568.5 |
 
-The `oracle` clones the game state and simulates candidate actions. With 89% PERFECT landings the jelly outruns the spoon (the spoon tops out at 48 m/s about 25.6 s into a run), so 35 of 40 oracle runs reach the 300 s cap.
-This ceiling is a known limitation; the score metric, run cap and seed count may change in a later environment version.
-Realistic agents and humans play in the range from `random` up to a few kilometres.
+The `oracle` clones the game state and simulates candidate actions. With 86% PERFECT landings the jelly outruns the spoon (the spoon tops out at 48 m/s about 25.6 s into a run), so all 50 oracle runs reach the 90 s cap.
+An agent that escapes the spoon scores close to 100; going further than the oracle within the cap scores above 100.
 
 ## Seeds
 
 Seeds 1–10 are public practice seeds. Official evaluation uses private seeds that are not in this repository, so results cannot be tuned to them.
-`run` accepts `--seeds-file <path>` for a private list, and `verify --seeds-file <path>` checks that a summary covers exactly those seeds.
-Seeds are integers 0..2^32−1.
+Seeds are integers 0..2^32−1. An official evaluation uses at least 50 seeds and runs in rounds:
+
+1. The evaluator publishes `node tools/bench/bench.mjs seeds-commit <seeds-file> --round <name>` (a sha256 of the sorted seeds and the round name).
+2. Runs use `run --seeds-file <seeds-file> --round <name> --official`. The summary records `seedsCommit`. `--official` refuses fewer than 50 seeds.
+3. After the round the seeds file is published, and anyone can check a summary with `verify <summary.json> --seeds-file <seeds-file> --official` (same seed set, same hash).
 
 ## Status
 

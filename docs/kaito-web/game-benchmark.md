@@ -120,7 +120,7 @@ CLI에서는 시간 초과와 프로세스 종료도 `null` 행동이 된다.
 
 ## 프로토콜
 
-CLI는 에이전트 명령을 셸로 띄우고 표준 입출력으로 JSON 객체를 한 줄에 하나씩 주고받는다. 표준 오류는 그대로 터미널에 나온다.
+CLI는 `--` 뒤에 지정한 실행 파일과 인수를 직접 실행하고 표준 입출력으로 JSON 객체를 한 줄에 하나씩 주고받는다. 기존 `--agent "<명령>"`은 신뢰하는 로컬 명령을 셸로 실행하는 방식이다. 에이전트는 실행한 사용자의 권한으로 동작하며, 표준 오류는 터미널에 나온다.
 
 | 방향 | 메시지 |
 | --- | --- |
@@ -131,13 +131,13 @@ CLI는 에이전트 명령을 셸로 띄우고 표준 입출력으로 JSON 객�
 | 환경 → 에이전트 | 판마다 `{"type":"done","episode","result":{…}}`(시드 없음), 끝에 `{"type":"end"}` |
 
 - 에이전트는 시드를 받지 않는다. `episode`는 이번 실행 안의 판 번호(0부터)다. 기록 파일과 요약에는 시드가 남는다.
-- 결정마다 벽시계 제한이 있다(기본 300초, `--timeout` 초, 유한한 양수). 넘으면 `null` 행동이 된다.
-- 답 줄은 지금 결정 번호와 같은 `step`을 가져야 한다. `step`이 없거나 다른 줄, JSON이 아닌 줄은 버리고 마감까지 기다린다.
-  그래서 시간이 지난 늦은 답이나 stdout 로그 줄이 다음 결정에 섞이지 않는다.
-- 에이전트 프로세스가 끝나면 남은 결정은 모두 `null` 행동이 된다. 요약의 `agentExited`에 처음 끝을 본 판 번호와 결정 번호가 남고, CLI 종료 코드는 1이다.
+- 결정마다 시간 제한이 있다(기본 300초, `--timeout`에 초 단위로 지정). 넘으면 `null` 행동이 된다.
+- `step`은 실행 전체에서 0부터 증가한다. 현재 관찰의 `step`과 일치하는 JSON 답만 받고, 64 KiB를 넘는 줄은 버린다.
+- 결정 중 에이전트 연결이 끊기면 남은 결정은 모두 `null` 행동이 된다. 요약의 `agentExited`에 처음 감지한 판 번호와 결정 번호가 남고, CLI 종료 코드는 1이다.
 - `meta` 줄은 행동이 아니다. 칸을 겹쳐 쌓아(뒤 값이 이긴다) 요약의 `agentMeta`에 남긴다. JSON 4 KB를 넘는 갱신은 버리고 `agentMetaTruncated: true`를 남긴다.
   `agentMeta`는 에이전트의 자가 보고(self-reported)다. CLI는 내용을 확인하지 않는다. 예: `claude-agent.mjs`는 시작에 모델 · effort · 대체(fallbacks) 여부를, 판 끝마다 누적 토큰과 답한 모델 이름을 보낸다.
 - 요약에는 실행한 Node 판(`nodeVersion`)도 남는다.
+- 저장하는 명령, 에이전트 메타데이터, 행동 문자열에 알려진 자격 증명 필드나 키 패턴이 있으면 가린다. API 키는 환경 변수로 전달한다.
 
 ## 기록과 환경 판
 
@@ -217,9 +217,9 @@ CLI는 에이전트 명령을 셸로 띄우고 표준 입출력으로 JSON 객�
 npm run bench -- baselines                                  # 기준 점수 표(segment, 기본 시드 1-50, random · fullCharge · oracle)
 npm run bench -- baselines --mode interval:8                # interval 방식(random · fullCharge, 참고)
 npm run bench -- baselines --agents random,fullCharge --json out.json
-npm run bench -- run --agent "node tools/bench/examples/heuristic-agent.mjs" --seeds 1-10 --out bench-out/heuristic
+npm run bench -- run --seeds 1-10 --out bench-out/heuristic -- node tools/bench/examples/heuristic-agent.mjs
 npm run bench -- seeds-commit ~/private-seeds.txt --round 2026-12   # 시드 회차 약속(sha256)을 미리 공개한다
-npm run bench -- run --agent "python3 tools/bench/examples/agent.py" --seeds-file ~/private-seeds.txt --round 2026-12 --official --out out/py
+npm run bench -- run --seeds-file ~/private-seeds.txt --round 2026-12 --official --out out/py -- python3 tools/bench/examples/agent.py
 npm run bench -- verify bench-out/heuristic/summary.json    # 기록과 기준 봇을 다시 돌려 점수 · 통계와 비교
 npm run bench -- verify out/py/summary.json --seeds-file ~/private-seeds.txt --official   # 시드 집합과 회차 약속까지 확인
 npm run bench -- compare out/a/summary.json out/b/summary.json   # 먼저 verify한 뒤 같은 시드 짝 비교(정규화 점수 차)
@@ -232,19 +232,19 @@ npm run bench -- version                                    # 지금 체크아�
 - `--seeds-file`로 돌리면 요약에 `seedsCommit`(회차 이름 `--round`, 시드 수, sha256)를 남긴다.
 - `verify`는 기록이나 요약을 받는다. 다시 돌린 결과를 출력한다. 다음 중 하나면 종료 코드 1이다.
   - 기록: 형식 · 게임 · 환경 판 · 시드 · 트랙 · 행동 방식이 틀리거나 다시 돌리기가 멈춘다.
-  - 요약: 게임 · 환경 판 · 트랙 · 행동 방식이 이 체크아웃과 다르다. 판이 하나도 없다. 기록 경로가 절대 경로이거나 `..`로 요약 폴더 밖을 가리킨다.
+  - 요약: 게임 · 환경 판 · 트랙 · 행동 방식 · 부트스트랩 설정이 이 체크아웃과 다르다. 판이 하나도 없다. 기록 경로가 요약 폴더 안의 일반 파일로 해석되지 않는다. 절대 경로와 `..`도 거절한다.
     같은 기록이나 같은 시드가 두 번 나온다. 판의 `seed` · 행동 방식이 기록과 다르다. `score`가 없거나, 판의 `score` · `result`가 다시 돌린 결과와 다르다.
     판의 `normalized` · `reference`가 기준 봇을 다시 돌려 계산한 값과 다르다. `capS`가 이 체크아웃의 판 상한과 다르다.
     다시 돌린 결과로 계산한 요약 칸(`summarizeRuns`의 모든 칸: 점수 · 구간 · 탈출률 · PERFECT · SPLAT · 잘못된 행동 · 거리 통계)이 요약과 다르다.
-  - `--seeds-file`을 주면 요약의 시드 집합(기록 하나면 그 시드)이 파일의 시드와 같아야 한다. 요약에 `seedsCommit`가 있으면 파일과 그 회차 이름으로 다시 계산한 sha256이 같아야 한다.
-  - `--official`을 주면 `--seeds-file`의 시드가 50개 이상이어야 하고, 요약이 공식 실행(`official: true`)이고 `seedsCommit`가 있어야 한다.
+  - 요약에 `seedsCommit`가 있으면 리플레이한 고유 시드 수와 회차 이름으로 계산한 SHA-256이 기록과 일치해야 한다. `--seeds-file`을 주면 요약의 시드 집합을 파일과 대조한다. 단일 기록은 시드가 파일에 들어 있는지 확인한다.
+  - 공식 요약(`official: true`)은 segment 방식, 고유 시드 50개 이상, `seedsCommit`가 필요하다. `verify --official`은 공식 요약과 대조할 시드 파일을 모두 요구한다.
 - `verify`는 `timeouts`, `agentExited`, `agentMeta`, `nodeVersion`을 확인하지 않는다. 실행 정보와 자가 보고다.
 - 예시 에이전트:
   - `heuristic-agent.mjs`(의존성 없음): 땅에서는 `fullCharge`와 같다. 공중에서는 규칙 글의 물리로 비행을 어림해 누를 때를 고른다.
   - `agent.py`(Python 표준 라이브러리): `fullCharge`와 같은 논리다.
   - `claude-agent.mjs`: Anthropic Messages API를 `fetch`로 결정마다 부른다. `ANTHROPIC_API_KEY`가 필요하다. 기본 모델은 `claude-opus-5-5`이고 `--model`·`--effort`로 바꾼다.
     거절에 대비한 서버 쪽 대체(`fallbacks`)를 기본으로 켠다. 대체는 다른 모델로 답할 수 있으므로 공식 실행에서는 `--no-fallbacks`를 준다. 토큰 사용량을 표준 오류와 `meta`에 적는다.
-  `claude-agent.mjs`는 한 판에 결정이 수십~수백 번이라 비용과 시간이 크다.
+  한 결정의 API 시간 제한은 응답 읽기와 429·5xx 재시도를 합해 60초다. 판마다 재시도 포함 HTTP 요청을 최대 250회 보낸다. 보고된 입출력 토큰 합계가 100,000에 도달하면 다음 요청을 보내지 않는다. 마지막 요청이 기준을 넘길 수 있고, 응답을 받기 전에 취소한 요청의 사용량은 집계에서 빠질 수 있다.
 
 ## 비공개 평가 시드
 
@@ -261,15 +261,7 @@ npm run bench -- version                                    # 지금 체크아�
 
 ## 공개 저장소
 
-공개 저장소는 [`jeonghwanko/oddbout-bench`](https://github.com/jeonghwanko/oddbout-bench)(MIT) 하나다. 이 저장소는 비공개로 둔다.
-이 저장소는 게임 규칙과 벤치 도구의 공개 사본이다. 평가 시드는 여기에 두지 않는다.
-
-- 넣는 것: 벤치 환경의 import 닫힘(`benchSources`, 환경 판과 같은 목록), CLI(`tools/bench/bench.mjs`, `tools/bench/sources.mjs`)와 예제, `tools/bench/public/`의 README · LICENSE · package.json · gitignore.
-- 넣지 않는 것: 닫힘 밖의 규칙 파일(미션 · 상점 · 라이벌 등), 그림 · 화면 · 사이트 · 저장 코드 · 평가 시드 · 이 저장소의 다른 코드.
-- git이 추적하는 일반 파일만 넣는다(`git ls-files`, `lstat().isFile()`). 넣을 경로에 커밋하지 않은 변경(`git status --porcelain`)이 있으면 실패한다.
-  `--allow-dirty`는 로컬 시험용이다. 작업 트리 내용을 넣으므로 그 사본은 공개하지 않는다.
-- 폴더 배치는 이 저장소와 같다. 그래서 공개 사본의 환경 판이 같고, 양쪽의 기록이 서로 검증된다. 도구는 두 환경 판이 다르거나 닫힘이 `src/sim/` 밖을 import 하면 실패한다.
-- 규칙이나 환경을 바꾸면 기준 점수를 다시 재고 `tools/bench/public/README.md`의 표도 고친 뒤 다시 내보낸다. 공개 저장소에 올리는 일은 사용자가 요청할 때만 한다.
+[`jeonghwanko/oddbout-bench`](https://github.com/jeonghwanko/oddbout-bench)는 게임 규칙에 필요한 코드, 벤치 CLI, 예제 에이전트와 테스트를 MIT 라이선스로 공개한다. 평가 시드와 결과는 평가 운영자가 별도로 관리한다.
 
 ## 아직 만들지 않은 것
 
@@ -280,7 +272,7 @@ npm run bench -- version                                    # 지금 체크아�
 
 ## 검증
 
-- 환경을 바꾸면 `npx vitest run test/bench-pudding.test.ts test/architecture.test.ts`를 돌린다.
+- 환경을 바꾸면 `npm test`, `npm run lint`, `npm run typecheck`를 돌린다.
 - 규칙이나 환경을 바꾸면 기준 점수를 다시 재고 위 표와 환경 판을 고친다.
 
 ## 결정 기록

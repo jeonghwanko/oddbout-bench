@@ -1,4 +1,6 @@
 // claude-agent.mjs 가 쓰는 순수 도움 함수(시험 가능, API 키 없음).
+import { setTimeout as delay } from "node:timers/promises";
+
 export const DEFAULT_MAX_TOKENS = 400;
 export const FETCH_TIMEOUT_MS = 60_000;
 export const MAX_RETRIES = 3;
@@ -52,6 +54,8 @@ export function retryAfterMs(res, attempt, baseMs = 500) {
   const raw = res?.headers?.get?.("retry-after");
   const sec = raw != null && raw !== "" ? Number(raw) : NaN;
   if (Number.isFinite(sec) && sec >= 0) return Math.min(30_000, sec * 1000);
+  const date = raw ? Date.parse(raw) : NaN;
+  if (Number.isFinite(date)) return Math.min(30_000, Math.max(0, date - Date.now()));
   return Math.min(30_000, baseMs * (2 ** attempt));
 }
 
@@ -60,40 +64,31 @@ export function shouldRetryStatus(status) {
 }
 
 /**
- * Messages API POST. 429·5xx 는 최대 `retries` 번 다시 시도한다. 기본 타임아웃은 `FETCH_TIMEOUT_MS`.
+ * Messages API POST. 429·5xx 재시도와 본문 읽기에 같은 마감 시간을 쓴다.
  * `fetchImpl` 과 `sleep` 은 시험에서 바꾼다.
  */
 export async function postMessage(options) {
   const {
     url = "https://api.anthropic.com/v1/messages",
     headers, body, timeoutMs = FETCH_TIMEOUT_MS, retries = MAX_RETRIES,
-    fetchImpl = globalThis.fetch, sleep = ms => new Promise(r => setTimeout(r, ms)),
+    fetchImpl = globalThis.fetch, sleep = delay, usage, signal: requestedSignal,
   } = options;
-  let lastErr = null;
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    let res;
-    try {
-      res = await fetchImpl(url, {
-        method: "POST",
-        headers,
-        body: typeof body === "string" ? body : JSON.stringify(body),
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-    } catch (error) {
-      lastErr = error;
-      if (attempt < retries && (error?.name === "TimeoutError" || error?.name === "AbortError")) {
-        await sleep(retryAfterMs(null, attempt));
-        continue;
-      }
-      throw error;
+  const timeout = AbortSignal.timeout(timeoutMs);
+  const signal = requestedSignal ? AbortSignal.any([timeout, requestedSignal]) : timeout;
+  const requestBody = JSON.stringify(body);
+  for (let attempt = 0; ; attempt++) {
+    signal.throwIfAborted();
+    if (!budgetRemaining(usage)) return null;
+    usage.calls++;
+    const res = await fetchImpl(url, { method: "POST", headers, body: requestBody, signal });
+    if (res.ok) {
+      const reply = await res.json();
+      usage.input += reply.usage?.input_tokens ?? 0;
+      usage.output += reply.usage?.output_tokens ?? 0;
+      return { body: reply, status: res.status };
     }
-    if (res.ok) return res;
-    if (shouldRetryStatus(res.status) && attempt < retries) {
-      await sleep(retryAfterMs(res, attempt));
-      lastErr = new Error(`HTTP ${res.status}`);
-      continue;
-    }
-    return res;
+    await res.body?.cancel();
+    if (attempt >= retries || !shouldRetryStatus(res.status) || !budgetRemaining(usage)) return { body: null, status: res.status };
+    await sleep(retryAfterMs(res, attempt), undefined, { signal });
   }
-  throw lastErr ?? new Error("request failed");
 }

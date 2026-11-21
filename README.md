@@ -17,7 +17,7 @@ cd oddbout-bench
 npm install                                                # optional; only lint and typecheck need it
 npm test && npm run lint && npm run typecheck
 node tools/bench/bench.mjs baselines                       # reference scores (seeds 1-50)
-node tools/bench/bench.mjs run --agent "node tools/bench/examples/heuristic-agent.mjs" --seeds 1-10 --out bench-out/heuristic
+node tools/bench/bench.mjs run --seeds 1-10 --out bench-out/heuristic -- node tools/bench/examples/heuristic-agent.mjs
 node tools/bench/bench.mjs verify bench-out/heuristic/summary.json
 node tools/bench/bench.mjs compare bench-out/a/summary.json bench-out/b/summary.json   # verifies both summaries, then pairs the same seeds
 ```
@@ -25,7 +25,7 @@ node tools/bench/bench.mjs compare bench-out/a/summary.json bench-out/b/summary.
 Your agent is any program that reads JSON lines on stdin and writes JSON lines on stdout. Any language works.
 See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-agent.mjs`), a Python agent (`agent.py`), and an LLM agent (`claude-agent.mjs`, Anthropic Messages API, needs `ANTHROPIC_API_KEY` in the environment; pass `--no-fallbacks` for an official run so every answer comes from the named model).
 
-Do not put API keys in the `--agent` command string. The summary records that string (obvious key patterns are redacted, but it is not a complete secret scrub). The CLI starts the agent with a shell so you can write a normal local command; a hosted leaderboard should run a fixed argv list in a sandbox instead.
+Pass the executable and its arguments after `--` to launch it directly. The legacy `--agent "<command>"` form runs a trusted local command through a shell. Both forms run with your local user permissions. Supply API keys through the environment. Saved commands, action strings and agent metadata mask recognized credential fields and key patterns.
 
 The contract is in [`docs/kaito-web/game-benchmark.md`](docs/kaito-web/game-benchmark.md).
 
@@ -38,7 +38,7 @@ The contract is in [`docs/kaito-web/game-benchmark.md`](docs/kaito-web/game-benc
 - **Deterministic.** The same seed and the same actions always give the same result. Terrain shape and features depend only on the seed. Star coin positions also depend on the transform stage when that stretch of terrain is generated.
 - **Versioned.** `envVersion` is a hash of the environment sources: the files reachable by relative imports from `src/sim/bench/index.ts` (line endings normalised). A trace from a different version is rejected.
 - **Official ranking** uses `segment` mode. `interval` mode is for reference. `--official` (on `run` and `verify`) rejects any other mode.
-- **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes every score and statistic. Repeated traces or seeds, missing scores and paths outside the summary folder fail. `compare` verifies both summaries against this checkout before pairing them.
+- **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes scores, statistics and any recorded seed commitment. Trace files must resolve inside the summary folder. `compare` verifies both summaries against this checkout before pairing them.
 
 ### Protocol
 
@@ -51,12 +51,12 @@ Environment → agent, one JSON object per line:
 {"type":"end"}
 ```
 
-Agent → environment: `{"step": <same step>, "action": <action>}` for every `obs`. `step` is required: lines without the current `step`, and lines that are not JSON, are ignored until the deadline (default 300 s per decision, `--timeout`).
+For each `obs`, the agent returns `{"step": <same step>, "action": <action>}`. The runner starts `step` at 0 and increments it across the entire run. It waits for a matching JSON reply until the deadline (default 300 s per decision, `--timeout`) and ignores lines over 64 KiB.
 
 - The agent is never told the seed (only the episode number). Traces and the summary record it.
 - `rules.physics` lists the physical constants and formulas (gravity, drag, charge time, landing angles, launch, speed cap, spoon speed, units), generated from the rule code.
 - An agent may send `{"type":"meta", …}` at any time (for example model name and token counts). It is stored as `agentMeta` in the summary (up to 4 KB). It is **self-reported** and not verified.
-- If the agent process exits, the remaining decisions are invalid, the summary records `agentExited`, and `run` exits with code 1.
+- If the agent disconnects during a decision, the remaining decisions are invalid, the summary records `agentExited`, and `run` exits with code 1.
 
 ### Action modes
 

@@ -1,7 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { setTimeout as delay } from "node:timers/promises";
 import {
-  DEFAULT_MAX_TOKENS, budgetRemaining, parseAction, postMessage, retryAfterMs, shouldRetryStatus, systemPrompt,
+  DEFAULT_MAX_TOKENS, MAX_CALLS_PER_RUN, budgetRemaining, parseAction, postMessage, retryAfterMs, shouldRetryStatus, systemPrompt,
 } from "../tools/bench/examples/claude-util.mjs";
 
 describe("claude-util", () => {
@@ -49,14 +50,46 @@ describe("claude-util", () => {
   });
 
   it("postMessage 는 429 뒤 성공하면 다시 시도한다", async () => {
-    const calls = [];
+    const usage = { calls: 0, input: 0, output: 0 };
+    let cancelled = false;
     const fetchImpl = async () => {
-      calls.push(1);
-      if (calls.length === 1) return { ok: false, status: 429, headers: { get: () => "0" } };
-      return { ok: true, status: 200, headers: { get: () => null } };
+      if (usage.calls === 1) {
+        return { ok: false, status: 429, headers: { get: () => "0" }, body: { cancel: () => { cancelled = true; } } };
+      }
+      return new Response(JSON.stringify({ usage: { input_tokens: 15, output_tokens: 6 } }));
     };
-    const res = await postMessage({ fetchImpl, headers: {}, body: {}, sleep: async () => {}, retries: 3, timeoutMs: 5_000 });
-    assert.equal(res.ok, true);
-    assert.equal(calls.length, 2);
+    const res = await postMessage({ usage, fetchImpl, headers: {}, body: {}, sleep: async () => {}, retries: 3, timeoutMs: 5_000 });
+    assert.equal(res.status, 200);
+    assert.deepEqual(usage, { calls: 2, input: 15, output: 6 });
+    assert.equal(cancelled, true);
+  });
+
+  it("마지막 호출이 실패해도 판 예산을 넘어 재시도하지 않는다", async () => {
+    const usage = { calls: MAX_CALLS_PER_RUN - 1, input: 0, output: 0 };
+    const fetchImpl = async () => new Response(null, { status: 503 });
+    const request = { usage, fetchImpl, body: {} };
+    assert.deepEqual(await postMessage(request), { body: null, status: 503 });
+    assert.equal(await postMessage(request), null);
+    assert.equal(usage.calls, MAX_CALLS_PER_RUN);
+  });
+
+  it("취소하면 재시도를 멈추고 시도한 호출만 센다", async () => {
+    const usage = { calls: 0, input: 0, output: 0 };
+    const controller = new AbortController();
+    const fetchImpl = async () => {
+      controller.abort();
+      return new Response(null, { status: 429, headers: { "retry-after": "10" } });
+    };
+    await assert.rejects(postMessage({ usage, fetchImpl, signal: controller.signal, body: {} }), { name: "AbortError" });
+    assert.equal(usage.calls, 1);
+  });
+
+  it("한 번의 마감 시간을 응답 본문에도 적용한다", async () => {
+    const usage = { calls: 0, input: 0, output: 0 };
+    const fetchImpl = async (_url, { signal }) => ({
+      ok: true, status: 200, json: () => delay(1000, {}, { signal }),
+    });
+    await assert.rejects(postMessage({ usage, fetchImpl, body: {}, timeoutMs: 20 }), { name: "AbortError" });
+    assert.equal(usage.calls, 1);
   });
 });

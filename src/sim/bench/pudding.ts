@@ -176,6 +176,7 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
   readonly actionMode: string;
   readonly envVersion: string;
   readonly mode: PuddingActionMode;
+  private capSteps = PUDDING_CAP_STEPS;
   private st: EnvState | null = null;
 
   constructor(options: PuddingEnvOptions) {
@@ -197,6 +198,7 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
     }
     const run = createRun(seed);
     startRun(run, seed, false);
+    this.capSteps = PUDDING_CAP_STEPS;
     this.st = { run, seed, steps: 0, done: false, caught: false, decisions: 0, invalid: 0, actions: [], seg: EMPTY_SEGMENT };
     return this.observe();
   }
@@ -213,10 +215,15 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
   /** 내부 규칙 상태. 강한 기준 에이전트(oracle)만 쓴다. 프로토콜로는 내보내지 않는다. */
   internalRun(): PuddingRun { return this.s.run; }
 
-  /** 같은 상태의 복제(앞을 내다보는 탐색용). 기록도 함께 복제한다. */
-  clone(): PuddingBenchEnv {
+  /** 같은 상태와 기록을 복제한다. 선택적으로 복제본에 남은 시뮬레이션 걸음을 제한한다. */
+  clone(maxAdditionalSteps?: number): PuddingBenchEnv {
     const env = new PuddingBenchEnv({ envVersion: this.envVersion, actionMode: this.actionMode });
     env.st = structuredClone(this.s);
+    env.capSteps = this.capSteps;
+    if (maxAdditionalSteps !== undefined) {
+      if (!Number.isSafeInteger(maxAdditionalSteps) || maxAdditionalSteps < 1) throw new Error("clone horizon must be a positive integer in steps");
+      env.capSteps = Math.min(env.capSteps, this.s.steps + maxAdditionalSteps);
+    }
     return env;
   }
 
@@ -270,7 +277,7 @@ export class PuddingBenchEnv implements BenchEnv<PuddingObs, unknown> {
     for (const e of events) if (e.kind !== "advance") log.push(e);
     if (events.some(e => e.kind === "transform")) { transformBurst(st.run); transformEnd(st.run); }
     if (events.some(e => e.kind === "caught")) { st.done = true; st.caught = true; }
-    if (st.steps >= PUDDING_CAP_STEPS) st.done = true;
+    if (st.steps >= this.capSteps) st.done = true;
     return events;
   }
 

@@ -36,7 +36,7 @@ The contract is in [`docs/kaito-web/game-benchmark.md`](docs/kaito-web/game-benc
 - **Score.** Each run gets a log-normalised score: `100 × (ln d − ln d_random) / (ln d_oracle − ln d_random)`, where `d` is the run's distance and `d_random`, `d_oracle` are the distances of the `random` and `oracle` reference bots (segment mode) on the same seed. The reference bots are deterministic, so the environment computes them itself. Scores are not clipped: below random is negative, beyond oracle is above 100. Seeds where the oracle does not beat random are left out and listed.
 - **Headline** = mean normalised score over seeds with a bootstrap 95% interval. Summaries also report the escape rate, PERFECT %, invalid-action rate and median distance (for reference). `interval` runs are normalised against the same segment references.
 - **Deterministic.** The same seed and the same actions always give the same result. Terrain shape and features depend only on the seed. Star coin positions also depend on the transform stage when that stretch of terrain is generated.
-- **Versioned.** `envVersion` is a hash of the environment sources: the files reachable by relative imports from `src/sim/bench/index.ts` (line endings normalised). A trace from a different version is rejected.
+- **Versioned.** `envVersion` is a hash of the environment sources: the files reachable by relative imports from `src/sim/bench/index.ts` (line endings normalised). A trace from a different version is rejected. The current envVersion `24d7a48ffc6c` includes the fixed-time scenario rollout.
 - **Official ranking** uses `segment` mode. `interval` mode is for reference. `--official` (on `run` and `verify`) rejects any other mode.
 - **Verified.** `verify` replays every trace in a summary, reruns the reference bots and recomputes scores, statistics and any recorded seed commitment. Trace files must resolve inside the summary folder. `compare` verifies both summaries against this checkout before pairing them.
 
@@ -70,6 +70,24 @@ Malformed actions, timeouts, and crashes are recorded as invalid actions; they k
 ### Observation (state track)
 
 Time, distance, position and velocity, ground speed, grounded/holding, charge, spoon gap and speed, transform stage, combo, a terrain profile for the next 100 m (height and slope every 2 m), upcoming terrain features (caramel, cream, stars), and a summary of what happened during your last action. Units are metres, m/s, and seconds; up is positive.
+
+## Same-state decision scenarios
+
+Full runs measure how far an agent gets. Decision scenarios measure what happens when two agents choose an action from exactly the same state. The default public suite has 12 cases each for ground timing, airborne timing, recovery after a SPLAT, and close pursuit. Each case uses a distinct seed.
+
+```bash
+mkdir -p bench-out
+npm run scenarios -- build --out bench-out/cases.json
+npm run scenarios -- run --cases bench-out/cases.json --out bench-out/heuristic-cases.json --jobs 4 -- node tools/bench/examples/heuristic-agent.mjs
+npm run scenarios -- verify --cases bench-out/cases.json bench-out/heuristic-cases.json
+npm run scenarios -- compare --cases bench-out/cases.json bench-out/agent-a.json bench-out/agent-b.json
+```
+
+The case file stores a seed and action prefix. The runner replays the prefix and sends the resulting observation to a fresh agent process. The agent chooses one action, then the fixed `fullCharge` policy takes over. The simulator stops at capture or exactly 360 ticks (3 game seconds) from the starting state. Results report survival, distance advanced, first-action landing grades and protocol failures.
+
+`verify` binds results to the SHA-256 of the case file and recomputes each outcome from its recorded action. `compare` checks both files, then pairs the same cases and reports distance differences and survival by category. A missing or invalid action follows the game's no-op rule and remains visible as a failure. Use `build --seeds-file <path>` to draw cases from a held-out seed pool.
+
+The output directory must exist. A run reserves its output path before launching agents and saves the result once all cases finish. If a run was forcibly terminated, remove the leftover `<output>.lock` directory after confirming the runner has stopped.
 
 ## Reference scores
 

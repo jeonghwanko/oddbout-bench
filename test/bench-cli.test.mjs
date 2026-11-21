@@ -133,14 +133,11 @@ describe("bench CLI 리뷰 보강", () => {
   it("stdout 연결이 끊기면 남은 결정에서 응답을 기다리지 않는다", t => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "oddbout-disconnect-"));
     t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
-    const file = path.join(dir, "agent.mjs");
-    fs.writeFileSync(file, `
-      if (process.platform === "win32") process.exit(1);
-      process.stdout.destroy();
-      setTimeout(() => {}, 15_000);
-    `);
+    const agent = process.platform === "win32"
+      ? [process.execPath, "-e", "process.exit(1)"]
+      : ["sh", "-c", "exec 1>&-; exec sleep 15"];
     const out = path.join(dir, "out");
-    const run = runBench(["run", "--seeds", "1", "--out", out, "--timeout", "300", "--", process.execPath, file], { timeout: 10_000 });
+    const run = runBench(["run", "--seeds", "1", "--out", out, "--timeout", "300", "--", ...agent], { timeout: 10_000 });
     assert.equal(run.status, 1, output(run));
     const summary = readJson(path.join(out, "summary.json"));
     assert.deepEqual(summary.agentExited, { episode: 0, step: 0 });

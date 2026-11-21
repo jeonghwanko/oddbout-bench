@@ -103,13 +103,13 @@ export const JELLY_TRAITS: Readonly<Record<JellyId, JellyTraits>> = {
   /** 점프가 높다 / PERFECT 각도 폭이 좁다. */
   bunny: trait({ jump: 1.12, perfectAngle: 0.24 }),
   /** 오르막 SPLAT 감속이 적다 / 최고 속력이 낮다. */
-  worm: trait({ uphillSplatKeep: 0.82, capAdd: -40 }),
+  worm: trait({ uphillSplatKeep: 0.82, capAdd: -50 }),
   /** 내리막 가속이 크다 / 점프가 낮다. */
   penguin: trait({ downhill: 1.4, jump: 0.98 }),
   /** 꾹 게이지가 빨리 찬다 / 게이지 최대 힘이 낮다. */
-  frog: trait({ chargeTime: 0.7, chargePower: 0.95 }),
+  frog: trait({ chargeTime: 0.6, chargePower: 0.95 }),
   /** 꽉 채워 떼면 짧은 탄산 부스트 / 게이지가 느리게 찬다. */
-  cola: trait({ fizz: 30, chargeTime: 1.5 }),
+  cola: trait({ fizz: 25, chargeTime: 1.5 }),
   /** PERFECT 각도 폭이 넓다 / PERFECT 보너스 속력이 작다. */
   ninjacat: trait({ perfectAngle: 0.36, perfectMul: 1.0, perfectAdd: 10 }),
   /** 동전 +15% / 숟가락이 조금 빠르다(측정에서 +20% 는 판당 골드가 곰젤리의 +10% 를 넘었다). */

@@ -16,7 +16,7 @@ import { nextFloat } from "../rng";
 import {
   AIR_DRAG, CATCH_GAP, FEVER_GRAVITY, FULL_HOLD, GOOD_ANGLE, GRADED_AIR, G_AIR, G_DIVE, G_HOLD, G_RUN, LAUNCH_FWD, LAUNCH_FWD_SLOPE,
   LAUNCH_POP_BASE, LAUNCH_POP_CHARGE, LAUNCH_STAGE_GAIN, LAUNCH_UP, LAUNCH_VALLEY_GAIN, type LandingGrade, PERFECT_ANGLE, type PuddingEvent,
-  type PuddingRun, SPEED_CAP_BASE, SPEED_CAP_FEVER, SPEED_CAP_STAGE, SPOON_ACCEL, SPOON_ACCEL2, SPOON_LEASH, SPOON_MAX, SPOON_V0, STAGE_GAIN_MAX,
+  type PuddingRun, SPEED_CAP_BASE, SPEED_CAP_FEVER, SPEED_CAP_STAGE, SPOON_ACCEL, SPOON_ACCEL2, SPOON_ACCEL_LATE, SPOON_LEASH, SPOON_MAX, SPOON_MAX_T, SPOON_V0, STAGE_GAIN_MAX,
   STEP, VALLEY_DIV, VALLEY_MAX, chargeOf, createRun, distanceM, fullHoldOf, setHold, spoonSpeedOf, startRun, stepRun, transformBurst, transformEnd,
 } from "../pudding/run";
 import { type FeatureKind, type Terrain, genTo, hill, slope } from "../pudding/terrain";
@@ -416,7 +416,7 @@ export function puddingPhysics(): readonly string[] {
     `Launch: v = min(cap, groundSpeed); a = atan(slope); pop = (${LAUNCH_POP_BASE} + ${LAUNCH_POP_CHARGE}*charge) * (1 + ${LAUNCH_VALLEY_GAIN}*valley) * (1 + ${LAUNCH_STAGE_GAIN}*min(stage, ${STAGE_GAIN_MAX})); `
       + `vx = v*cos(a) + pop*(${LAUNCH_FWD_SLOPE}*sin(a) + ${LAUNCH_FWD}); vy = v*sin(a) - ${LAUNCH_UP}*pop.`,
     `Valley bonus: valley = min(${VALLEY_MAX}, max(0, -k*v^2/${VALLEY_DIV})), k = y''/(1 + slope^2)^1.5 (negative in a valley bottom).`,
-    `Spoon speed (units/s): min(${SPOON_MAX}, ${SPOON_V0} + ${SPOON_ACCEL}*t + ${SPOON_ACCEL2}*t^2), t = run time in s; it never falls more than ${SPOON_LEASH} units behind; caught when the gap <= ${CATCH_GAP} units.`,
+    `Spoon speed (units/s): min(${SPOON_MAX}, ${SPOON_V0} + ${SPOON_ACCEL}*t + ${SPOON_ACCEL2}*t^2) + ${SPOON_ACCEL_LATE}*max(0, t - T0), t = run time in s, T0 = ${r3(SPOON_MAX_T)} s (when it reaches ${SPOON_MAX}; it keeps speeding up after that); it never falls more than ${SPOON_LEASH} units behind; caught when the gap <= ${CATCH_GAP} units.`,
   ];
 }
 

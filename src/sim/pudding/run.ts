@@ -73,11 +73,16 @@ export const PREDICT_MAX_T = 3;
 /** 동전 하나의 골드. */
 export const COIN_GOLD = 10;
 /**
- * 숟가락 속력(초당 x): 처음 `SPOON_V0`, 판 시간(`runT`, 튜토리얼 제외)에 따라 `SPOON_ACCEL`·t + `SPOON_ACCEL2`·t² 만큼 빨라지고 `SPOON_MAX` 에서 멈춘다.
+ * 숟가락 속력(초당 x): 처음 `SPOON_V0`, 판 시간(`runT`, 튜토리얼 제외)에 따라 `SPOON_ACCEL`·t + `SPOON_ACCEL2`·t² 만큼 빨라져 `SPOON_MAX` 에 닿는다.
  * 점프가 납작해져(2026-11-19 2안) 같은 시간에 더 멀리 가므로, 판 길이(초)가 전과 비슷하도록 뒤로 갈수록 더 빨라지게 했다.
+ * `SPOON_MAX` 에 닿은 뒤(`SPOON_MAX_T`, 약 25.6초)에도 초당 `SPOON_ACCEL_LATE` 씩 계속 빨라진다(2026-11-21 천장 해결 "lin 16").
+ * PERFECT 를 이어 속력 상한을 지키면 숟가락을 영영 따돌리던 천장을 없앤다. `SPOON_MAX_T` 전의 판은 그대로다.
  */
-export const SPOON_V0 = 100, SPOON_ACCEL = 2, SPOON_ACCEL2 = 0.5, SPOON_MAX = 480;
-export const spoonSpeed = (runT: number): number => Math.min(SPOON_MAX, SPOON_V0 + SPOON_ACCEL * runT + SPOON_ACCEL2 * runT * runT);
+export const SPOON_V0 = 100, SPOON_ACCEL = 2, SPOON_ACCEL2 = 0.5, SPOON_MAX = 480, SPOON_ACCEL_LATE = 16;
+/** 숟가락이 `SPOON_MAX` 에 닿는 판 시간(초): `SPOON_V0 + SPOON_ACCEL·t + SPOON_ACCEL2·t² = SPOON_MAX` 의 양의 근. */
+export const SPOON_MAX_T = (-SPOON_ACCEL + Math.sqrt(SPOON_ACCEL * SPOON_ACCEL + 4 * SPOON_ACCEL2 * (SPOON_MAX - SPOON_V0))) / (2 * SPOON_ACCEL2);
+export const spoonSpeed = (runT: number): number =>
+  Math.min(SPOON_MAX, SPOON_V0 + SPOON_ACCEL * runT + SPOON_ACCEL2 * runT * runT) + SPOON_ACCEL_LATE * Math.max(0, runT - SPOON_MAX_T);
 /** 숟가락과의 거리가 이 값 이하면 잡힌다. */
 export const CATCH_GAP = 14;
 /** 숟가락 끈: 곰젤리보다 이만큼 넘게 뒤처지면 끈처럼 따라붙는다. */

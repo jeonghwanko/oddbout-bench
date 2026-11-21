@@ -26,7 +26,7 @@ See [`tools/bench/examples/`](tools/bench/examples): a rule agent (`heuristic-ag
 ## How it works
 
 - **Turn-based.** The game does not advance while your agent thinks. Model latency does not change the score.
-- **Fixed conditions.** Default character, no items, no tutorial, no continues. A run ends when the spoon catches the jelly, or at 90 s of game time (an *escape*).
+- **Fixed conditions.** Default character, no items, no tutorial, no continues. A run ends when the spoon catches the jelly, or at 90 s of game time (an *escape*; the spoon keeps speeding up after about 25.6 s, so escapes are rare).
 - **Score.** Each run gets a log-normalised score: `100 × (ln d − ln d_random) / (ln d_oracle − ln d_random)`, where `d` is the run's distance and `d_random`, `d_oracle` are the distances of the `random` and `oracle` reference bots (segment mode) on the same seed. The reference bots are deterministic, so the environment computes them itself. Scores are not clipped: below random is negative, beyond oracle is above 100. Seeds where the oracle does not beat random are left out and listed.
 - **Headline** = mean normalised score over seeds with a bootstrap 95% interval. Summaries also report the escape rate, PERFECT %, invalid-action rate and median distance (for reference). `interval` runs are normalised against the same segment references.
 - **Deterministic.** The same seed and the same actions always give the same result. Terrain shape and features depend only on the seed. Star coin positions also depend on the transform stage when that stretch of terrain is generated.
@@ -67,19 +67,19 @@ Time, distance, position and velocity, ground speed, grounded/holding, charge, s
 
 ## Reference scores
 
-Seeds 1–50, 90 s cap, envVersion `b8b220dc08dd` (measured 2026-11-21).
+Seeds 1–50, 90 s cap, envVersion `b3b71f1fca0f` (measured 2026-11-21).
 
 | Mode | Agent | Score | 95% CI | Escape % | PERFECT % | Median m |
 | --- | --- | --- | --- | --- | --- | --- |
 | segment | `random` (reference, 0 by definition) | 0 | 0–0 | 0 | 2.6 | 435.5 |
-| segment | `fullCharge` (always charge fully, never dive) | 12.9 | 7.6–18.2 | 0 | 7.2 | 666.5 |
-| segment | `heuristic-agent.mjs` (example; observations and `rules.physics` only) | 44.2 | 41.0–47.5 | 0 | 15.4 | 1,374 |
-| segment | `oracle` (reference, 100 by definition; searches with the internal rules) | 100 | 100–100 | 100 | 85.9 | 7,313 |
-| interval:8 | `random` | 9.6 | 5.5–13.9 | 0 | 5.0 | 597 |
-| interval:8 | `fullCharge` | 9.1 | 4.1–14.1 | 0 | 7.2 | 568.5 |
+| segment | `fullCharge` (always charge fully, never dive) | 15.3 | 9.1–21.4 | 0 | 7.2 | 666.5 |
+| segment | `heuristic-agent.mjs` (example; observations and `rules.physics` only) | 49.5 | 46.8–52.1 | 0 | 15.8 | 1,374 |
+| segment | `oracle` (reference, 100 by definition; searches with the internal rules) | 100 | 100–100 | 0 | 84.6 | 4,684 |
+| interval:8 | `random` | 11.1 | 6.2–16.2 | 0 | 5.0 | 597 |
+| interval:8 | `fullCharge` | 10.6 | 4.6–16.4 | 0 | 7.2 | 568.5 |
 
-The `oracle` clones the game state and simulates candidate actions. With 86% PERFECT landings the jelly outruns the spoon (the spoon tops out at 48 m/s about 25.6 s into a run), so all 50 oracle runs reach the 90 s cap.
-An agent that escapes the spoon scores close to 100; going further than the oracle within the cap scores above 100.
+The `oracle` clones the game state and simulates candidate actions. The spoon reaches 48 m/s about 25.6 s into a run and then keeps speeding up by 1.6 m/s every second, so even the oracle (85% PERFECT landings) is caught: 0 of 50 oracle runs escape, caught after 61 s (median; 55–68 s for the middle 80%).
+An agent that survives longer than the oracle scores above 100.
 
 ## Seeds
 

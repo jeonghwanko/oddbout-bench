@@ -67,7 +67,7 @@ Time, distance, position and velocity, ground speed, grounded/holding, charge, s
 
 ## Reference scores
 
-Seeds 1–50, 90 s cap, envVersion `b3b71f1fca0f` (measured 2026-11-21).
+Seeds 1–50, 90 s cap, envVersion `52f6ef79b672` (measured 2026-11-21).
 
 | Mode | Agent | Score | 95% CI | Escape % | PERFECT % | Median m |
 | --- | --- | --- | --- | --- | --- | --- |

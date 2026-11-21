@@ -119,7 +119,7 @@ export const JELLY_TRAITS: Readonly<Record<JellyId, JellyTraits>> = {
   /** 판의 첫 SPLAT 한 번은 감속이 없다 / 동전 −10%(측정에서 −15% 는 판당 골드가 곰젤리의 −10% 아래였다). */
   ghost: trait({ softSplats: 1, coin: 0.9 }),
   /** 땅 속력 상한이 높다 / SPLAT 감속이 크다(무겁다). */
-  mecha: trait({ capAdd: 160, splatKeep: 0.69, uphillSplatKeep: 0.69 }),
+  mecha: trait({ capAdd: 130, splatKeep: 0.69, uphillSplatKeep: 0.69 }),
 };
 /** id 의 특성. 모르는 id 면 곰젤리. */
 export const jellyTraits = (id: string): JellyTraits => isJellyId(id) ? JELLY_TRAITS[id] : BEAR_TRAITS;

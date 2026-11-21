@@ -279,11 +279,16 @@ export function startRun(s: PuddingRun, seed: number, tutorial: boolean, stock: 
   s.y = hill(s.terrain, 0);
 }
 
+/** 이어 달리기가 숟가락 시계를 되돌리는 값(초): 숟가락이 최고 속력에 닿은 뒤(`SPOON_MAX_T`) 잡힌 판만 `SPOON_MAX_T − 이 값` 으로 돌린다. */
+export const REVIVE_SPOON_BACK_S = 3;
 /**
  * 이어 달리기: 같은 자리에서 숟가락을 `SPOON_LEASH` 뒤에 두고, 숟가락보다 조금(20) 빠르게 다시 달린다(변신 단계·거리·골드·진단 사실은 그대로).
  * 남은 아이템은 그대로다(다시 채우지 않는다). 날아가던 폭탄 · 숟가락 기절 · 따라오기는 비운다.
+ * 숟가락이 최고 속력 뒤에도 빨라지므로(lin 16), 그 뒤에 잡힌 판은 숟가락 시계를 `SPOON_MAX_T − REVIVE_SPOON_BACK_S` 로 돌린다(2026-11-21).
+ * 그래서 이어 달리기로 더 버티는 시간이 숟가락이 480 에서 멈추던 때와 비슷하다. 그 전에 잡힌 판은 그대로다.
  */
 export function reviveRun(s: PuddingRun): void {
+  if (s.runT >= SPOON_MAX_T) s.runT = SPOON_MAX_T - REVIVE_SPOON_BACK_S;
   Object.assign(s, { y: hill(s.terrain, s.wx), grounded: true, caughtT: -1, spoonX: s.wx - SPOON_LEASH, gap: SPOON_LEASH,
     v: Math.max(140, Math.min(SPOON_MAX, spoonSpeedOf(s) + 20)), vx: 0, vy: 0, hold: false, holdT: 0, full: false,
     bonkT: 0, landT: 0, airT: 0, freeze: 0, boostT: 1.5, bombT: -1, spoonStunT: 0, spoonRecover: false });

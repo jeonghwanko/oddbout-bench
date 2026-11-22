@@ -1,0 +1,115 @@
+{
+  "format": "oddbout-bench/1",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "seed": 1,
+  "track": "state",
+  "actionMode": "segment",
+  "actions": [
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 500
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 700
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 400,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 300
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 650
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 400
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 0
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 400
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 400,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 200
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 650
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 400,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 400,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    }
+  ]
+}

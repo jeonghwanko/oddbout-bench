@@ -1,0 +1,82 @@
+{
+  "format": "oddbout-bench-summary/2",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "track": "state",
+  "actionMode": "segment",
+  "capS": 90,
+  "official": false,
+  "seedsCommit": null,
+  "agent": "Claude Code subscription",
+  "createdAt": "2026-11-21T15:43:49.097Z",
+  "nodeVersion": "v22.22.2",
+  "timeouts": 0,
+  "agentExited": null,
+  "agentMeta": {
+    "model": "claude-fable-5-2",
+    "effort": "low",
+    "client": "Claude Code",
+    "tools": "no tool actions",
+    "calls": 68,
+    "modelsSeen": [
+      "claude-fable-5-2"
+    ]
+  },
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 20261121
+  },
+  "runs": 1,
+  "score": 75.49,
+  "scoreCi95": [
+    75.49,
+    75.49
+  ],
+  "scoredRuns": 1,
+  "unscoredSeeds": [],
+  "escapePct": 0,
+  "perfectPct": 45.5,
+  "splatPct": 0,
+  "invalidPct": 0,
+  "invalidActions": 0,
+  "decisionsPerRun": 68,
+  "medianDistance": 2445,
+  "meanDistance": 2445,
+  "p90Distance": 2445,
+  "medianDistanceCi95": [
+    2445,
+    2445
+  ],
+  "episodes": [
+    {
+      "seed": 1,
+      "score": 2445,
+      "normalized": 75.49,
+      "reference": {
+        "random": 341,
+        "oracle": 4635
+      },
+      "trace": "trace-seed-1.json",
+      "result": {
+        "game": "pudding-escape",
+        "seed": 1,
+        "score": 2445,
+        "scoreName": "distanceM",
+        "decisions": 68,
+        "invalidActions": 0,
+        "stats": {
+          "distanceM": 2445,
+          "timeS": 38.933,
+          "caught": true,
+          "landings": 22,
+          "perfect": 10,
+          "good": 12,
+          "splat": 0,
+          "maxCombo": 22,
+          "stage": 5,
+          "gold": 1040
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "format": "oddbout-bench/1",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "seed": 1,
+  "track": "state",
+  "actionMode": "segment",
+  "actions": [
+    {
+      "waitMs": 1300,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 350,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 0
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 625
+    },
+    {
+      "pressAfterMs": 400
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 425
+    },
+    {
+      "pressAfterMs": null
+    },
+    null,
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 0
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 570
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 1175
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 975
+    },
+    {
+      "pressAfterMs": 417
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 750
+    },
+    {
+      "pressAfterMs": null
+    }
+  ]
+}

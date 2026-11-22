@@ -1,0 +1,724 @@
+{
+  "format": "oddbout-pudding-scenario-results/1",
+  "envVersion": "24d7a48ffc6c",
+  "caseSetSha256": "e49d39ab1b77d52f635e3ea513452a1a71be6beec3b1e0b7cd5355d709ac68f8",
+  "agent": "heuristic",
+  "cases": [
+    {
+      "id": "ground-01",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 148.113,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-01",
+      "action": {
+        "pressAfterMs": 0
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "good"
+        ],
+        "survived": true,
+        "distanceM": 88.288,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-01",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 10.188,
+        "elapsedS": 0.917
+      }
+    },
+    {
+      "id": "chase-01",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 81.829,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "ground-02",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 187.23,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-02",
+      "action": {
+        "pressAfterMs": 300
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 201.975,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-02",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 3.336,
+        "elapsedS": 0.658
+      }
+    },
+    {
+      "id": "chase-02",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 158.493,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "ground-03",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 168.996,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-03",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "good"
+        ],
+        "survived": true,
+        "distanceM": 128.815,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-03",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 47.48,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-03",
+      "action": {
+        "pressAfterMs": 225
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 9.77,
+        "elapsedS": 0.375
+      }
+    },
+    {
+      "id": "ground-04",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 173.538,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-04",
+      "action": {
+        "pressAfterMs": 475
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "good"
+        ],
+        "survived": true,
+        "distanceM": 171.169,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-04",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 70.772,
+        "elapsedS": 2.816
+      }
+    },
+    {
+      "id": "chase-04",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 3.107,
+        "elapsedS": 0.208
+      }
+    },
+    {
+      "id": "ground-05",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 174.227,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-05",
+      "action": {
+        "pressAfterMs": 625
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "perfect"
+        ],
+        "survived": true,
+        "distanceM": 176.573,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-05",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 60.116,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-05",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 184.096,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "ground-06",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 148.539,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-06",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 159.934,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-06",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 65.067,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-06",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 2.163,
+        "elapsedS": 0.458
+      }
+    },
+    {
+      "id": "ground-07",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 167.715,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-07",
+      "action": {
+        "pressAfterMs": 875
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 14.398,
+        "elapsedS": 0.916
+      }
+    },
+    {
+      "id": "recovery-07",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 49.98,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-07",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 13.549,
+        "elapsedS": 0.7
+      }
+    },
+    {
+      "id": "ground-08",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 133.872,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-08",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "good"
+        ],
+        "survived": true,
+        "distanceM": 156.418,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-08",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 37.576,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-08",
+      "action": {
+        "pressAfterMs": 875
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 16.81,
+        "elapsedS": 1.125
+      }
+    },
+    {
+      "id": "ground-09",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 172.786,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-09",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 138.501,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-09",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 72.411,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-09",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 153.218,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "ground-10",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 171.235,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-10",
+      "action": {
+        "pressAfterMs": 25
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 139.713,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-10",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 46.193,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-10",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 0.632,
+        "elapsedS": 0.191
+      }
+    },
+    {
+      "id": "ground-11",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 167.033,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-11",
+      "action": {
+        "pressAfterMs": 275
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "splat"
+        ],
+        "survived": true,
+        "distanceM": 102.427,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "recovery-11",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 79.551,
+        "elapsedS": 2.742
+      }
+    },
+    {
+      "id": "chase-11",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 9.535,
+        "elapsedS": 0.625
+      }
+    },
+    {
+      "id": "ground-12",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 360
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 158.891,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "air-12",
+      "action": {
+        "pressAfterMs": 0
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [
+          "splat"
+        ],
+        "survived": false,
+        "distanceM": 56.501,
+        "elapsedS": 2.216
+      }
+    },
+    {
+      "id": "recovery-12",
+      "action": {
+        "waitMs": 0,
+        "holdMs": 750
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": true,
+        "distanceM": 59.28,
+        "elapsedS": 3
+      }
+    },
+    {
+      "id": "chase-12",
+      "action": {
+        "pressAfterMs": null
+      },
+      "status": "ok",
+      "outcome": {
+        "invalid": false,
+        "firstGrades": [],
+        "survived": false,
+        "distanceM": 2.39,
+        "elapsedS": 0.192
+      }
+    }
+  ]
+}

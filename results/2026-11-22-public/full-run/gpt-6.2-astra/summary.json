@@ -1,0 +1,82 @@
+{
+  "format": "oddbout-bench-summary/2",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "track": "state",
+  "actionMode": "segment",
+  "capS": 90,
+  "official": false,
+  "seedsCommit": null,
+  "agent": "Codex subscription",
+  "createdAt": "2026-11-21T15:46:37.175Z",
+  "nodeVersion": "v22.22.2",
+  "timeouts": 0,
+  "agentExited": null,
+  "agentMeta": {
+    "model": "gpt-6.2-astra",
+    "effort": "low",
+    "client": "Codex",
+    "tools": "no tool actions",
+    "calls": 88,
+    "modelsSeen": [
+      "gpt-6.2-astra"
+    ]
+  },
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 20261121
+  },
+  "runs": 1,
+  "score": 86.113,
+  "scoreCi95": [
+    86.113,
+    86.113
+  ],
+  "scoredRuns": 1,
+  "unscoredSeeds": [],
+  "escapePct": 0,
+  "perfectPct": 52.9,
+  "splatPct": 0,
+  "invalidPct": 0,
+  "invalidActions": 0,
+  "decisionsPerRun": 88,
+  "medianDistance": 3226,
+  "meanDistance": 3226,
+  "p90Distance": 3226,
+  "medianDistanceCi95": [
+    3226,
+    3226
+  ],
+  "episodes": [
+    {
+      "seed": 1,
+      "score": 3226,
+      "normalized": 86.113,
+      "reference": {
+        "random": 341,
+        "oracle": 4635
+      },
+      "trace": "trace-seed-1.json",
+      "result": {
+        "game": "pudding-escape",
+        "seed": 1,
+        "score": 3226,
+        "scoreName": "distanceM",
+        "decisions": 88,
+        "invalidActions": 0,
+        "stats": {
+          "distanceM": 3226,
+          "timeS": 47.442,
+          "caught": true,
+          "landings": 34,
+          "perfect": 18,
+          "good": 16,
+          "splat": 0,
+          "maxCombo": 34,
+          "stage": 6,
+          "gold": 1080
+        }
+      }
+    }
+  ]
+}

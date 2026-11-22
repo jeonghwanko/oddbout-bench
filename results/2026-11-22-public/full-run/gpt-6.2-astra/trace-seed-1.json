@@ -1,0 +1,316 @@
+{
+  "format": "oddbout-bench/1",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "seed": 1,
+  "track": "state",
+  "actionMode": "segment",
+  "actions": [
+    {
+      "waitMs": 0,
+      "holdMs": 1125
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 740
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 665
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 825
+    },
+    {
+      "pressAfterMs": 475
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 325
+    },
+    {
+      "pressAfterMs": 200
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 240
+    },
+    {
+      "pressAfterMs": 395
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 305
+    },
+    {
+      "pressAfterMs": 200
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 238
+    },
+    {
+      "pressAfterMs": 65
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 905
+    },
+    {
+      "pressAfterMs": 115
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 290
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 610
+    },
+    {
+      "pressAfterMs": 45
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 258
+    },
+    {
+      "pressAfterMs": 200
+    },
+    {
+      "pressAfterMs": 720
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 125
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 560
+    },
+    {
+      "pressAfterMs": 100
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 545
+    },
+    {
+      "pressAfterMs": 580
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 50
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 540
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 700
+    },
+    {
+      "pressAfterMs": 425
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 550
+    },
+    {
+      "pressAfterMs": 315
+    },
+    {
+      "pressAfterMs": 500
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 475
+    },
+    {
+      "pressAfterMs": 385
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 215
+    },
+    {
+      "pressAfterMs": 775
+    },
+    {
+      "pressAfterMs": 490
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 200
+    },
+    {
+      "pressAfterMs": 350
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 170
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 500
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 190
+    },
+    {
+      "pressAfterMs": 655
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 480
+    },
+    {
+      "pressAfterMs": 645
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 135
+    },
+    {
+      "pressAfterMs": 265
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 400
+    },
+    {
+      "pressAfterMs": 510
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 150
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 650
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 405
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 355
+    },
+    {
+      "pressAfterMs": 370
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 190
+    },
+    {
+      "pressAfterMs": 440
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 625
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 335
+    },
+    {
+      "pressAfterMs": 65
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 85
+    },
+    {
+      "pressAfterMs": 520
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 230
+    },
+    {
+      "pressAfterMs": 765
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 235
+    },
+    {
+      "pressAfterMs": 475
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 135
+    },
+    {
+      "pressAfterMs": 260
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 160
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 410
+    },
+    {
+      "pressAfterMs": 0
+    }
+  ]
+}

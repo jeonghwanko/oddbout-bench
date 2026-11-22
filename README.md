@@ -91,6 +91,8 @@ The output directory must exist. A run reserves its output path before launching
 
 ## Reference scores
 
+[Public model runs and replay artifacts](results/2026-11-22-public/README.md) include the seed-1 demonstration and the 48-case same-state comparison.
+
 Seeds 1–50, 90 s cap, envVersion `f6a7f66a6884` (scores measured 2026-11-21; hash updated 2026-11-22 when `reset` began rejecting seed 0 — physics and scores on seeds 1..2^32−1 are unchanged).
 
 | Mode | Agent | Score | 95% CI | Escape % | PERFECT % | Median m |

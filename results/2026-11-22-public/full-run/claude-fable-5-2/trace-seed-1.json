@@ -1,0 +1,248 @@
+{
+  "format": "oddbout-bench/1",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "seed": 1,
+  "track": "state",
+  "actionMode": "segment",
+  "actions": [
+    {
+      "waitMs": 400,
+      "holdMs": 1050
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 430
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 125,
+      "holdMs": 360
+    },
+    {
+      "pressAfterMs": 0
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 500
+    },
+    {
+      "pressAfterMs": 770
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 300
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 810
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 1140
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 790
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 1500
+    },
+    {
+      "pressAfterMs": 190
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 350
+    },
+    {
+      "pressAfterMs": 420
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 480
+    },
+    {
+      "pressAfterMs": 300
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 225
+    },
+    {
+      "pressAfterMs": 890
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 200
+    },
+    {
+      "pressAfterMs": 405
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 117
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 3000,
+      "holdMs": 0
+    },
+    {
+      "pressAfterMs": 70
+    },
+    {
+      "waitMs": 3000,
+      "holdMs": 0
+    },
+    {
+      "pressAfterMs": 70
+    },
+    {
+      "waitMs": 3000,
+      "holdMs": 0
+    },
+    {
+      "pressAfterMs": 0
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 720
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 90
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 8
+    },
+    {
+      "pressAfterMs": 135
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 450
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 8
+    },
+    {
+      "pressAfterMs": 240
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 200
+    },
+    {
+      "pressAfterMs": 325
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 208
+    },
+    {
+      "pressAfterMs": 335
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 235
+    },
+    {
+      "pressAfterMs": 880
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 100
+    },
+    {
+      "pressAfterMs": null
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 680
+    },
+    {
+      "pressAfterMs": 280
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 165
+    },
+    {
+      "pressAfterMs": 490
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 150
+    },
+    {
+      "pressAfterMs": 600
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 190
+    },
+    {
+      "pressAfterMs": 740
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 175
+    },
+    {
+      "pressAfterMs": 855
+    },
+    {
+      "waitMs": 0,
+      "holdMs": 380
+    },
+    {
+      "pressAfterMs": 810
+    }
+  ]
+}

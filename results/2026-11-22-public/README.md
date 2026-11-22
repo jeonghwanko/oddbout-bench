@@ -11,9 +11,10 @@ Each model played one episode of the state track in segment mode. The Codex and 
 | GPT-6.2 Astra | 86.113 | 3,226 m | 52.9% | 88 | 0 | [Summary](full-run/gpt-6.2-astra/summary.json) |
 | Claude Fable 5.2 | 75.490 | 2,445 m | 45.5% | 68 | 0 | [Summary](full-run/claude-fable-5-2/summary.json) |
 | Claude Opus 5.5 | 67.810 | 2,001 m | 18.2% | 71 | 0 | [Summary](full-run/claude-opus-5-5/summary.json) |
+| Grok (web Expert) | 41.382 | 1,004 m | 14.3% | 30 | 0 | [Summary](full-run/grok-expert/summary.json) |
 | GPT-6.2 Sol | 22.537 | 614 m | 25.0% | 20 | 1 | [Summary](full-run/gpt-6.2-sol/summary.json) |
 
-One public seed provides a replayable example. A comparison across multiple held-out seeds is needed to estimate how consistently the models differ. The historical runs did not record token usage.
+One public seed provides a replayable example. A comparison across multiple held-out seeds is needed to estimate how consistently the models differ. The historical runs did not record token usage. Grok played through the web client with Expert selected and the same public seed and decision protocol. The interface did not expose an exact model ID or a token count.
 
 ### Replay the archived runs
 

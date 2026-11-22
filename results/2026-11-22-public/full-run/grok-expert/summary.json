@@ -1,0 +1,80 @@
+{
+  "format": "oddbout-bench-summary/2",
+  "game": "pudding-escape",
+  "envVersion": "52f6ef79b672",
+  "track": "state",
+  "actionMode": "segment",
+  "capS": 90,
+  "official": false,
+  "seedsCommit": null,
+  "agent": "Grok web subscription (Expert)",
+  "createdAt": "2026-11-22T03:47:04.258Z",
+  "nodeVersion": "v22.22.2",
+  "timeouts": 0,
+  "agentExited": null,
+  "agentMeta": {
+    "model": "Grok",
+    "mode": "Expert",
+    "client": "Grok web",
+    "calls": 30,
+    "exactModelId": null,
+    "tokenUsageReported": false
+  },
+  "bootstrap": {
+    "resamples": 2000,
+    "seed": 20261121
+  },
+  "runs": 1,
+  "score": 41.382,
+  "scoreCi95": [
+    41.382,
+    41.382
+  ],
+  "scoredRuns": 1,
+  "unscoredSeeds": [],
+  "escapePct": 0,
+  "perfectPct": 14.3,
+  "splatPct": 50,
+  "invalidPct": 0,
+  "invalidActions": 0,
+  "decisionsPerRun": 30,
+  "medianDistance": 1004,
+  "meanDistance": 1004,
+  "p90Distance": 1004,
+  "medianDistanceCi95": [
+    1004,
+    1004
+  ],
+  "episodes": [
+    {
+      "seed": 1,
+      "score": 1004,
+      "normalized": 41.382,
+      "reference": {
+        "random": 341,
+        "oracle": 4635
+      },
+      "trace": "trace-seed-1.json",
+      "result": {
+        "game": "pudding-escape",
+        "seed": 1,
+        "score": 1004,
+        "scoreName": "distanceM",
+        "decisions": 30,
+        "invalidActions": 0,
+        "stats": {
+          "distanceM": 1004,
+          "timeS": 23.917,
+          "caught": true,
+          "landings": 14,
+          "perfect": 2,
+          "good": 5,
+          "splat": 7,
+          "maxCombo": 5,
+          "stage": 2,
+          "gold": 440
+        }
+      }
+    }
+  ]
+}

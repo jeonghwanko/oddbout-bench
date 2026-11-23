@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf5ec">
+  <meta name="description" content="같은 언덕, 다른 선택. 실제 푸딩 탈출 벤치마크의 리플레이로 두 AI의 승자를 맞혀 보세요.">
+  <title>푸딩 탈출 AI 아레나</title>
+  <link rel="preload" as="image" href="./art/custard-horizon.webp" type="image/webp">
+  <link rel="stylesheet" href="./arena.css">
+  <script type="module" src="./arena.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="./" aria-label="푸딩 탈출 AI 아레나 처음으로">
+        <span class="brand-icon" aria-hidden="true"></span>
+        <span>ODDBOUT <b>ARCADE</b></span>
+      </a>
+      <button id="help-open" class="plain-button help-button" type="button"><span aria-hidden="true">?</span> 게임 방법</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="hero">
+      <div class="hero-copy">
+        <h1>푸딩 탈출 <span>AI 아레나</span></h1>
+        <p>같은 언덕, 다른 조작. 어느 AI가 이길까요?</p>
+      </div>
+      <div class="scoreboard" id="scoreboard" aria-label="현재 점수">
+        <span>내 점수</span>
+        <strong><span id="score">0</span><small> / 3</small></strong>
+        <div id="score-marks" class="score-marks" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+
+    <section class="arena" id="arena" aria-labelledby="scenario-title">
+      <div class="round-bar">
+        <div class="round-label">
+          <span class="round-count" id="round-count">라운드 1 / 3</span>
+          <h2 id="scenario-title" tabindex="-1">공중 타이밍</h2>
+        </div>
+        <div class="round-context">
+          <span class="observation" id="observation"></span>
+          <span class="duration"><span class="clock-icon" aria-hidden="true"></span> 3초 승부</span>
+        </div>
+      </div>
+
+      <div class="lanes" id="lanes">
+        <article class="lane lane-a" id="lane-a" aria-labelledby="name-a">
+          <div class="lane-head">
+            <span class="lane-letter" aria-hidden="true">A</span>
+            <h3 id="name-a">AI A</h3>
+            <span class="lane-status" id="status-a">모델 비공개</span>
+          </div>
+          <div class="viewport">
+            <canvas id="canvas-a" role="img" aria-label="AI A의 푸딩 언덕"></canvas>
+            <span class="hud" id="hud-a"></span>
+            <span class="event" id="event-a" hidden></span>
+          </div>
+          <div class="lane-foot">
+            <div class="action"><span class="input-cue" id="cue-a" aria-hidden="true"></span><strong id="action-a"></strong><span id="detail-a"></span></div>
+            <button class="pick" id="pick-a" type="button">A 선택</button>
+            <output class="distance" id="distance-a" hidden></output>
+          </div>
+        </article>
+        <span class="versus" aria-hidden="true">VS</span>
+        <article class="lane lane-b" id="lane-b" aria-labelledby="name-b">
+          <div class="lane-head">
+            <span class="lane-letter" aria-hidden="true">B</span>
+            <h3 id="name-b">AI B</h3>
+            <span class="lane-status" id="status-b">모델 비공개</span>
+          </div>
+          <div class="viewport">
+            <canvas id="canvas-b" role="img" aria-label="AI B의 푸딩 언덕"></canvas>
+            <span class="hud" id="hud-b"></span>
+            <span class="event" id="event-b" hidden></span>
+          </div>
+          <div class="lane-foot">
+            <div class="action"><span class="input-cue" id="cue-b" aria-hidden="true"></span><strong id="action-b"></strong><span id="detail-b"></span></div>
+            <button class="pick" id="pick-b" type="button">B 선택</button>
+            <output class="distance" id="distance-b" hidden></output>
+          </div>
+        </article>
+      </div>
+
+      <div id="prediction-note" class="prediction-note">
+        <span class="note-icon" aria-hidden="true">i</span>
+        <p id="hint">두 모델의 첫 조작을 보고 승자를 고르세요.</p>
+      </div>
+      <div class="transport" id="transport" hidden>
+        <button class="quiet-button" id="toggle" type="button">일시정지</button>
+        <label class="timeline-label" for="timeline">리플레이 시간</label>
+        <input id="timeline" type="range" min="0" max="360" value="0" aria-valuetext="0초">
+        <span id="time-readout">0.0 / 3.0초</span>
+        <button class="plain-button" id="skip" type="button">결과 보기</button>
+      </div>
+      <div class="result-area" id="result" hidden>
+        <div>
+          <h3 id="result-title" tabindex="-1"></h3>
+          <p id="result-detail"></p>
+        </div>
+        <div class="result-actions">
+          <button class="quiet-button" id="copy-link" type="button">리플레이 링크 복사</button>
+          <button class="quiet-button" id="try-open" type="button">직접 도전</button>
+          <button class="primary-button" id="next" type="button">다음 라운드</button>
+        </div>
+      </div>
+      <p class="copy-status" id="copy-status" role="status" hidden></p>
+    </section>
+
+    <section class="summary" id="summary" aria-labelledby="summary-title" hidden>
+      <div class="summary-head">
+        <span class="summary-mark" aria-hidden="true"><span></span></span>
+        <h2 id="summary-title" tabindex="-1">세 라운드 완료</h2>
+        <p id="final-score"></p>
+      </div>
+      <ol class="recap" id="recap"></ol>
+      <div class="summary-actions">
+        <button class="quiet-button" id="summary-try" type="button">같은 구간 직접 도전</button>
+        <button class="primary-button" id="restart" type="button">다시 플레이</button>
+      </div>
+    </section>
+
+    <noscript><p>게임을 실행하려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
+    <footer class="site-footer">
+      <p><span class="record-icon" aria-hidden="true"></span> 공개 벤치마크 기록 · 2026.11.22</p>
+      <div>
+        <a id="record-link" href="https://github.com/jeonghwanko/oddbout-bench/tree/main/results/2026-11-22-public" target="_blank" rel="noopener">벤치마크 원본</a>
+        <a href="https://pudding.oddbout.com/" target="_blank" rel="noopener">푸딩 탈출 플레이</a>
+      </div>
+    </footer>
+  </main>
+
+  <dialog id="help" aria-labelledby="help-title">
+    <div class="dialog-head">
+      <h2 id="help-title">게임 방법</h2>
+      <form method="dialog"><button class="icon-button" type="submit" aria-label="게임 방법 닫기">×</button></form>
+    </div>
+    <ol class="rules">
+      <li>같은 언덕에서 고른 두 AI의 첫 조작을 보고 A 또는 B를 선택하세요.</li>
+      <li>3초 동안 하나만 살아남으면 생존한 쪽이 이깁니다. 둘 다 살아남거나 둘 다 잡히면 더 멀리 간 쪽이 이깁니다.</li>
+      <li>생존 상태가 같고 거리 차이가 1m 미만이면 무승부로, 어느 쪽을 골라도 1점을 얻습니다.</li>
+    </ol>
+    <p class="dialog-note">첫 조작 뒤에는 두 젤리 모두 같은 풀차지 봇이 이어서 조작합니다.</p>
+    <form method="dialog"><button class="primary-button" type="submit">게임으로 돌아가기</button></form>
+  </dialog>
+
+  <dialog class="try-dialog" id="try" aria-labelledby="try-title">
+    <div class="dialog-head">
+      <div>
+        <p class="try-tag" id="try-case"></p>
+        <h2 id="try-title">직접 도전</h2>
+      </div>
+      <form method="dialog"><button class="icon-button" type="submit" aria-label="직접 도전 닫기">×</button></form>
+    </div>
+    <div class="viewport try-viewport">
+      <canvas id="try-canvas" role="img" aria-label="내 젤리의 푸딩 언덕"></canvas>
+      <span class="hud" id="try-hud"></span>
+      <span class="event" id="try-event" hidden></span>
+    </div>
+    <form id="try-form">
+      <p class="dialog-note">첫 조작을 고르면 풀차지 봇이 남은 구간을 이어서 달립니다.</p>
+      <fieldset id="ground-controls">
+        <legend>점프 시점</legend>
+        <label for="wait">대기 시간 <output id="wait-value" for="wait"></output></label>
+        <input id="wait" type="range" min="0" max="3000" step="25" value="0">
+        <label for="hold">누르는 시간 <output id="hold-value" for="hold"></output></label>
+        <input id="hold" type="range" min="0" max="1500" step="25" value="350">
+      </fieldset>
+      <fieldset id="air-controls">
+        <legend>공중 조작</legend>
+        <div class="choices">
+          <label><input type="radio" name="air-mode" value="dive" checked> 다이브</label>
+          <label><input type="radio" name="air-mode" value="glide"> 활공 유지</label>
+        </div>
+        <label for="dive">다이브까지 대기 <output id="dive-value" for="dive"></output></label>
+        <input id="dive" type="range" min="0" max="3000" step="25" value="0">
+      </fieldset>
+      <button class="primary-button" id="try-run" type="submit">내 조작 재생</button>
+    </form>
+    <p class="try-result" id="try-result" role="status" hidden></p>
+  </dialog>
+</body>
+</html>

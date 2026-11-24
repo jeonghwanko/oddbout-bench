@@ -1,0 +1,1003 @@
+{
+  "format": "oddbout-bounce-scenario-results/1",
+  "game": "bounce-ball",
+  "track": "state",
+  "actionMode": "one-edit",
+  "envVersion": "9b0a13a8aa67",
+  "caseSetSha256": "faa47518e33d3ab9263d32faf38cfc58e309f4fb709838a3420a651843a65bc1",
+  "agent": "node tools/bench/examples/bounce-model-agent.mjs codex gpt-6.2-astra",
+  "cases": [
+    {
+      "id": "wall-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 24328,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15950,
+            "inputTokens": 15857,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 93,
+            "reasoningOutputTokens": 72
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:0",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 25636,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15999,
+            "inputTokens": 15903,
+            "cachedInputTokens": 13824,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 96,
+            "reasoningOutputTokens": 80
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 123,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 23133,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15940,
+            "inputTokens": 15866,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 74,
+            "reasoningOutputTokens": 53
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:0"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 24143,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15978,
+            "inputTokens": 15907,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 71,
+            "reasoningOutputTokens": 55
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 39,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 4,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 25251,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15953,
+            "inputTokens": 15869,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 84,
+            "reasoningOutputTokens": 63
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "none"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 27166,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16034,
+            "inputTokens": 15906,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 128,
+            "reasoningOutputTokens": 114
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 104,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 16,
+            "ticks": 4,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 24002,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15924,
+            "inputTokens": 15862,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 62,
+            "reasoningOutputTokens": 41
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "none",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 31212,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16093,
+            "inputTokens": 15903,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 190,
+            "reasoningOutputTokens": 176
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 110,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 25594,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16017,
+            "inputTokens": 15843,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 174,
+            "reasoningOutputTokens": 152
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 18831,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15986,
+            "inputTokens": 15881,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 105,
+            "reasoningOutputTokens": 87
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 113,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 8,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 28907,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16123,
+            "inputTokens": 15847,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 276,
+            "reasoningOutputTokens": 255
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 22019,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15958,
+            "inputTokens": 15884,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 74,
+            "reasoningOutputTokens": 58
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 45,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 25071,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16028,
+            "inputTokens": 15846,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 182,
+            "reasoningOutputTokens": 160
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:12"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 24005,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16000,
+            "inputTokens": 15899,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 101,
+            "reasoningOutputTokens": 85
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 82,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "arrow-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 8,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 20855,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15944,
+            "inputTokens": 15850,
+            "cachedInputTokens": 13824,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 94,
+            "reasoningOutputTokens": 73
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 23424,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16088,
+            "inputTokens": 15885,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 203,
+            "reasoningOutputTokens": 187
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 102,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "crumble-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 19035,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15934,
+            "inputTokens": 15865,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 69,
+            "reasoningOutputTokens": 48
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 17362,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15973,
+            "inputTokens": 15913,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 60,
+            "reasoningOutputTokens": 44
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:9",
+        "ticks": 55,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 8,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 17553,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15959,
+            "inputTokens": 15874,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 85,
+            "reasoningOutputTokens": 64
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:9",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 20778,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16131,
+            "inputTokens": 15907,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 224,
+            "reasoningOutputTokens": 208
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:9",
+        "ticks": 57,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 17393,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15920,
+            "inputTokens": 15865,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 55,
+            "reasoningOutputTokens": 33
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 15208,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15953,
+            "inputTokens": 15903,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 50,
+            "reasoningOutputTokens": 34
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 39,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 21400,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15980,
+            "inputTokens": 15871,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 109,
+            "reasoningOutputTokens": 87
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:6"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 21703,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16149,
+            "inputTokens": 15913,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 236,
+            "reasoningOutputTokens": 220
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 57,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 28,
+            "ticks": 8,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 40034,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16506,
+            "inputTokens": 15849,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 657,
+            "reasoningOutputTokens": 635
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 12550,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 15988,
+            "inputTokens": 15894,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 94,
+            "reasoningOutputTokens": 80
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:9",
+        "ticks": 88,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 27487,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16086,
+            "inputTokens": 15849,
+            "cachedInputTokens": 13824,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 237,
+            "reasoningOutputTokens": 215
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 30056,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16357,
+            "inputTokens": 15901,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 456,
+            "reasoningOutputTokens": 442
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 51,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "door-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 45439,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16370,
+            "inputTokens": 15868,
+            "cachedInputTokens": 5376,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 502,
+            "reasoningOutputTokens": 480
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 16677,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16047,
+            "inputTokens": 15893,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 154,
+            "reasoningOutputTokens": 140
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:12",
+        "ticks": 93,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 42174,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16291,
+            "inputTokens": 15869,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 422,
+            "reasoningOutputTokens": 400
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:12",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 42088,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-astra",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 16531,
+            "inputTokens": 15905,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 626,
+            "reasoningOutputTokens": 610
+          },
+          "modelSeen": "gpt-6.2-astra"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:12",
+        "ticks": 78,
+        "cause": null,
+        "status": "playing"
+      }
+    }
+  ]
+}

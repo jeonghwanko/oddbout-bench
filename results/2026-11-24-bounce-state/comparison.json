@@ -1,0 +1,145 @@
+{
+  "a": {
+    "recovered": 13,
+    "cases": 16,
+    "bothScenesRecovered": 6,
+    "pairs": 8,
+    "predicted": 28,
+    "probes": 32,
+    "byMechanic": {
+      "wall": 4,
+      "arrow": 2,
+      "crumble": 4,
+      "door": 3
+    },
+    "repairResponses": {
+      "responded": 16,
+      "invalid": 0,
+      "timeout": 0,
+      "exited": 0,
+      "medianWallMs": 24699.5
+    },
+    "predictionResponses": {
+      "responded": 16,
+      "invalid": 0,
+      "timeout": 0,
+      "exited": 0,
+      "medianWallMs": 22721.5
+    }
+  },
+  "b": {
+    "recovered": 11,
+    "cases": 16,
+    "bothScenesRecovered": 5,
+    "pairs": 8,
+    "predicted": 24,
+    "probes": 32,
+    "byMechanic": {
+      "wall": 4,
+      "arrow": 2,
+      "crumble": 4,
+      "door": 1
+    },
+    "repairResponses": {
+      "responded": 16,
+      "invalid": 0,
+      "timeout": 0,
+      "exited": 0,
+      "medianWallMs": 27149.5
+    },
+    "predictionResponses": {
+      "responded": 16,
+      "invalid": 0,
+      "timeout": 0,
+      "exited": 0,
+      "medianWallMs": 25437.5
+    }
+  },
+  "matchedDiff": {
+    "recoveryDeltaPp": 12.5,
+    "pairCount": 8,
+    "ci95Pp": [
+      0,
+      31.25
+    ]
+  },
+  "metering": {
+    "gpt-6.2-astra": {
+      "calls": 32,
+      "metered": 32,
+      "input": 508147,
+      "cachedInput": 79488,
+      "output": 6043,
+      "reasoningOutput": 5451,
+      "modelIds": [
+        "gpt-6.2-astra"
+      ]
+    },
+    "gpt-6.2-sol": {
+      "calls": 32,
+      "metered": 32,
+      "input": 590205,
+      "cachedInput": 115072,
+      "output": 11486,
+      "reasoningOutput": 10897,
+      "modelIds": [
+        "gpt-6.2-sol"
+      ]
+    }
+  },
+  "failures": [
+    [
+      "arrow-2-a",
+      "arrow-2-b",
+      "door-1-b"
+    ],
+    [
+      "arrow-2-a",
+      "arrow-2-b",
+      "door-1-a",
+      "door-1-b",
+      "door-2-a"
+    ]
+  ],
+  "divergences": [
+    {
+      "id": "door-1-a",
+      "astra": {
+        "repair": {
+          "start": 28,
+          "ticks": 8,
+          "axis": -1
+        }
+      },
+      "sol": {
+        "repair": {
+          "start": 20,
+          "ticks": 16,
+          "axis": -1
+        }
+      }
+    },
+    {
+      "id": "door-2-a",
+      "astra": {
+        "repair": {
+          "start": 20,
+          "ticks": 16,
+          "axis": -1
+        }
+      },
+      "sol": {
+        "repair": {
+          "start": 8,
+          "ticks": 4,
+          "axis": 0
+        }
+      }
+    }
+  ],
+  "commonFailures": [
+    "arrow-2-a",
+    "arrow-2-b",
+    "door-1-b"
+  ]
+}

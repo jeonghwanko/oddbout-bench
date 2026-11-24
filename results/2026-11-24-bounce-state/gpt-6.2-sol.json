@@ -1,0 +1,1003 @@
+{
+  "format": "oddbout-bounce-scenario-results/1",
+  "game": "bounce-ball",
+  "track": "state",
+  "actionMode": "one-edit",
+  "envVersion": "9b0a13a8aa67",
+  "caseSetSha256": "faa47518e33d3ab9263d32faf38cfc58e309f4fb709838a3420a651843a65bc1",
+  "agent": "node tools/bench/examples/bounce-model-agent.mjs codex gpt-6.2-sol",
+  "cases": [
+    {
+      "id": "wall-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 27987,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18755,
+            "inputTokens": 18431,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 324,
+            "reasoningOutputTokens": 303
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:0",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 28020,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18674,
+            "inputTokens": 18455,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 219,
+            "reasoningOutputTokens": 203
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 123,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 30104,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18612,
+            "inputTokens": 18436,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 176,
+            "reasoningOutputTokens": 155
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:0"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 27621,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18625,
+            "inputTokens": 18472,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 153,
+            "reasoningOutputTokens": 137
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 39,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 4,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 25548,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18612,
+            "inputTokens": 18430,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 182,
+            "reasoningOutputTokens": 161
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 26180,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18628,
+            "inputTokens": 18472,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 156,
+            "reasoningOutputTokens": 142
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 104,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "wall-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 26211,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18640,
+            "inputTokens": 18427,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 213,
+            "reasoningOutputTokens": 192
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "none",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 29869,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18775,
+            "inputTokens": 18462,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 313,
+            "reasoningOutputTokens": 299
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:0",
+        "ticks": 20,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 30113,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18846,
+            "inputTokens": 18408,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 438,
+            "reasoningOutputTokens": 416
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "none",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 31078,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18772,
+            "inputTokens": 18459,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 313,
+            "reasoningOutputTokens": 297
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 113,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 39145,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 19167,
+            "inputTokens": 18408,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 759,
+            "reasoningOutputTokens": 738
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 22849,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18686,
+            "inputTokens": 18452,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 234,
+            "reasoningOutputTokens": 218
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 49,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "arrow-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 27893,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18765,
+            "inputTokens": 18409,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 356,
+            "reasoningOutputTokens": 334
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "none",
+            "land:12"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 31278,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18819,
+            "inputTokens": 18454,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 365,
+            "reasoningOutputTokens": 349
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 82,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "arrow-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 8,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 25601,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18700,
+            "inputTokens": 18411,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 289,
+            "reasoningOutputTokens": 268
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 27452,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18677,
+            "inputTokens": 18446,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 231,
+            "reasoningOutputTokens": 213
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 102,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "crumble-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 19465,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18610,
+            "inputTokens": 18446,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 164,
+            "reasoningOutputTokens": 143
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:9"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 15681,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18575,
+            "inputTokens": 18472,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 103,
+            "reasoningOutputTokens": 87
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:9",
+        "ticks": 55,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": 1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 22075,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18708,
+            "inputTokens": 18437,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 271,
+            "reasoningOutputTokens": 250
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:9",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 26544,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18808,
+            "inputTokens": 18472,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 336,
+            "reasoningOutputTokens": 320
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:9",
+        "ticks": 57,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 0,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 19493,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18632,
+            "inputTokens": 18430,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 202,
+            "reasoningOutputTokens": 180
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "land:6",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 15855,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18582,
+            "inputTokens": 18468,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 114,
+            "reasoningOutputTokens": 98
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 39,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "crumble-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 26406,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18901,
+            "inputTokens": 18438,
+            "cachedInputTokens": 3968,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 463,
+            "reasoningOutputTokens": 441
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "land:6"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 24695,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18676,
+            "inputTokens": 18470,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 206,
+            "reasoningOutputTokens": 190
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 2,
+        "reachedTarget": true,
+        "contact": "land:6",
+        "ticks": 57,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-1-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 20,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 61185,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 19864,
+            "inputTokens": 18432,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 1432,
+            "reasoningOutputTokens": 1410
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 16366,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18677,
+            "inputTokens": 18455,
+            "cachedInputTokens": 16256,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 222,
+            "reasoningOutputTokens": 208
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "none",
+        "ticks": 138,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-1-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 12,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 33408,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18970,
+            "inputTokens": 18424,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 546,
+            "reasoningOutputTokens": 524
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 13595,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18706,
+            "inputTokens": 18453,
+            "cachedInputTokens": 0,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 253,
+            "reasoningOutputTokens": 239
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "none",
+        "ticks": 138,
+        "cause": null,
+        "status": "playing"
+      }
+    },
+    {
+      "id": "door-2-a",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 8,
+            "ticks": 4,
+            "axis": 0
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 24583,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 19057,
+            "inputTokens": 18420,
+            "cachedInputTokens": 16256,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 637,
+            "reasoningOutputTokens": 616
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 15554,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18723,
+            "inputTokens": 18456,
+            "cachedInputTokens": 6528,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 267,
+            "reasoningOutputTokens": 253
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": false,
+        "contact": "death",
+        "ticks": 40,
+        "cause": "fall",
+        "status": "dead"
+      }
+    },
+    {
+      "id": "door-2-b",
+      "repair": {
+        "action": {
+          "repair": {
+            "start": 8,
+            "ticks": 16,
+            "axis": -1
+          }
+        },
+        "transport": "received",
+        "elapsedMs": 42483,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 19537,
+            "inputTokens": 18430,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 1107,
+            "reasoningOutputTokens": 1085
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "predict": {
+        "action": {
+          "predict": [
+            "death",
+            "death"
+          ]
+        },
+        "transport": "received",
+        "elapsedMs": 22472,
+        "agentMeta": {
+          "provider": "codex",
+          "requestedModel": "gpt-6.2-sol",
+          "effort": "low",
+          "usage": {
+            "totalTokens": 18912,
+            "inputTokens": 18470,
+            "cachedInputTokens": 5248,
+            "cacheWriteInputTokens": 0,
+            "outputTokens": 442,
+            "reasoningOutputTokens": 428
+          },
+          "modelSeen": "gpt-6.2-sol"
+        }
+      },
+      "outcome": {
+        "repairValid": true,
+        "predictionValid": true,
+        "predictionCorrect": 1,
+        "reachedTarget": true,
+        "contact": "land:12",
+        "ticks": 78,
+        "cause": null,
+        "status": "playing"
+      }
+    }
+  ]
+}

@@ -124,6 +124,8 @@ Bounce Ball's physics and pure scenario adapter come from `crashbang-heroes/kait
 Run `node tools/bench/sync-bounce.mjs <path-to-kaito_web>` to check the source version. Add `--write` to refresh the public copy.
 The game and case versions are independent of the Pudding Escape versions. This public 16-scene set is a pilot, with the Vision track and held-out rounds left for later.
 
+[Bounce Ball pilot scores and replay records](results/2026-11-24-bounce-state/README.md)
+
 ## Reference scores
 
 [Public model runs and replay artifacts](results/2026-11-22-public/README.md) include the seed-1 demonstration and the 48-case same-state comparison.

@@ -20,7 +20,7 @@ const round = number => Math.round(number * 1000) / 1000 || 0;
 const write = (file, value) => writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, { flag: "wx" });
 
 function loadSet(file) {
-  const raw = readFileSync(file);
+  const raw = readFileSync(file, "utf8").replace(/\r\n/g, "\n");
   const doc = JSON.parse(raw);
   if (doc?.format !== BOUNCE_CASE_FORMAT || doc.track !== "state" || doc.actionMode !== BOUNCE_ACTION_MODE
     || !Array.isArray(doc.cases) || !doc.cases.length || !doc.rooms) throw new Error("invalid Bounce Ball case set");

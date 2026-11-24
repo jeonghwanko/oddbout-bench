@@ -112,7 +112,7 @@ For `task: "repair"`, return `{"step":0,"action":{"repair":{"start":4,"ticks":8,
 For `task: "predict"`, return `{"step":0,"action":{"predict":["land:6","death"]}}`.
 The repair prompt omits the probes.
 The reset message specifies the legal offsets, durations, directions, and labels. `--cases` can load a different manifest with the same format as
-[the pilot cases](tools/bench/fixtures/bounce-state-pilot.json). The fixture SHA-256 and the Bounce Ball environment version bind every result to its inputs.
+[the pilot cases](tools/bench/fixtures/bounce-state-pilot.json). The fixture SHA-256 (with LF line endings) and the Bounce Ball environment version bind every result to its inputs.
 The example model agent uses installed Codex or Claude Code clients, with low effort, tool execution disabled or checked, and an exact model ID.
 Set `BENCH_CODEX_EXE` or `BENCH_CLAUDE_EXE` when the native executable is outside PATH. On Windows, set the variable to the executable's `.exe` file.
 

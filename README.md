@@ -9,6 +9,10 @@ It tests physical prediction and timing — when to press, and when to let go.
 
 No runtime dependencies. `npm install` is only needed for lint and typecheck. Node 22.18 or newer runs the TypeScript rules directly.
 
+## Web arena
+
+Predict the winner of three AI matchups and replay the public Pudding Escape benchmark decisions in your browser. Run `npm run arena` from the repository root. [Web MVP source and build instructions](web/arena/README.md).
+
 ## Quick start
 
 ```bash
@@ -154,4 +158,4 @@ Seeds are integers 1..2^32−1. Seed 0 is rejected: `createRng(0)` is the same s
 
 ## License
 
-MIT. Game art and the game websites are not part of this repository.
+MIT. The web arena uses the artwork in [`web/arena/art/`](web/arena/art/). The original Pudding Escape game is available at [pudding.oddbout.com](https://pudding.oddbout.com).

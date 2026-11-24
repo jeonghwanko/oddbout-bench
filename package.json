@@ -11,6 +11,7 @@
   "scripts": {
     "bench": "node tools/bench/bench.mjs",
     "scenarios": "node tools/bench/scenarios.mjs",
+    "bounce": "node tools/bench/bounce-scenarios.mjs",
     "test": "node --test --import ./tools/bench/register-ts.mjs test/*.test.ts test/*.test.mjs",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"

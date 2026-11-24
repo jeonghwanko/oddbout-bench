@@ -89,6 +89,37 @@ The case file stores a seed and action prefix. The runner replays the prefix and
 
 The output directory must exist. A run reserves its output path before launching agents and saves the result once all cases finish. If a run was forcibly terminated, remove the leftover `<output>.lock` directory after confirming the runner has stopped.
 
+## Bounce Ball State pilot
+
+Bounce Ball steers an automatically bouncing ball left or right. In this pilot, the original input kills the ball.
+The agent sees the full room and the state just before the failure sequence. It can replace one contiguous span of the original input.
+The objective is to land alive on the marked ground tile within the scene's fixed horizon.
+
+There are 16 scenes in eight room pairs, covering wall kicks, arrow pads, breakable blocks, and doors. The two states in each pair are close in position and require different edits.
+Each scene also has two fixed physics probes. The agent predicts the first landing's three-column band, death, or no contact for each probe.
+The runner scores these predictions independently of whether the repair succeeds.
+
+```bash
+npm run bounce -- audit
+npm run bounce -- baselines
+npm run bounce -- run --out bench-out/bounce-astra.json -- node tools/bench/examples/bounce-model-agent.mjs codex gpt-6.2-astra
+npm run bounce -- verify bench-out/bounce-astra.json
+npm run bounce -- compare bench-out/bounce-astra.json bench-out/bounce-sol.json
+```
+
+Any JSON Lines agent works. Each scene sends two observations to separate fresh agent processes.
+For `task: "repair"`, return `{"step":0,"action":{"repair":{"start":4,"ticks":8,"axis":-1}}}`.
+For `task: "predict"`, return `{"step":0,"action":{"predict":["land:6","death"]}}`.
+The repair prompt omits the probes.
+The reset message specifies the legal offsets, durations, directions, and labels. `--cases` can load a different manifest with the same format as
+[the pilot cases](tools/bench/fixtures/bounce-state-pilot.json). The fixture SHA-256 and the Bounce Ball environment version bind every result to its inputs.
+The example model agent uses installed Codex or Claude Code clients, with low effort, tool execution disabled or checked, and an exact model ID.
+Set `BENCH_CODEX_EXE` or `BENCH_CLAUDE_EXE` when the native executable is outside PATH. On Windows, set the variable to the executable's `.exe` file.
+
+Bounce Ball's physics and pure scenario adapter come from `crashbang-heroes/kaito_web/src/sim/`.
+Run `node tools/bench/sync-bounce.mjs <path-to-kaito_web>` to check the source version. Add `--write` to refresh the public copy.
+The game and case versions are independent of the Pudding Escape versions. This public 16-scene set is a pilot, with the Vision track and held-out rounds left for later.
+
 ## Reference scores
 
 [Public model runs and replay artifacts](results/2026-11-22-public/README.md) include the seed-1 demonstration and the 48-case same-state comparison.
@@ -118,8 +149,8 @@ Seeds are integers 1..2^32−1. Seed 0 is rejected: `createRng(0)` is the same s
 
 ## Status
 
-- Done: state track, segment and interval modes, replay verification, baselines, example agents, tests, lint, CI.
-- Not yet: vision track (agents see the game screen), human baseline page, public leaderboard, more games.
+- Done: Pudding Escape State track, segment and interval modes, replay verification, baselines, example agents, tests, lint, CI. Bounce Ball State scenario pilot.
+- Planned: Vision track (agents see the game screen), human baseline page, public leaderboard.
 
 ## License
 

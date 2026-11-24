@@ -21,8 +21,8 @@ function relativeImports(root, rel) {
 }
 
 /** 벤치 환경의 import 닫힘(경로 차례, `/` 구분). */
-export function benchSources(root) {
-  const seen = new Set(), todo = [BENCH_ENTRY];
+export function benchSources(root, entry = BENCH_ENTRY) {
+  const seen = new Set(), todo = [entry];
   while (todo.length) {
     const rel = todo.pop();
     if (seen.has(rel)) continue;
@@ -33,9 +33,9 @@ export function benchSources(root) {
 }
 
 /** 환경 판: 닫힘의 파일마다 상대 경로와 내용(줄 끝 `\r\n` → `\n`)을 sha256 에 넣은 앞 12 글자. */
-export function benchEnvVersion(root) {
+export function benchEnvVersion(root, entry = BENCH_ENTRY) {
   const h = createHash("sha256");
-  for (const f of benchSources(root)) {
+  for (const f of benchSources(root, entry)) {
     h.update(f); h.update("\0");
     h.update(fs.readFileSync(path.join(root, f), "utf8").replace(/\r\n/g, "\n")); h.update("\0");
   }
